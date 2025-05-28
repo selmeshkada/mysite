@@ -1,0 +1,60 @@
+{% extends "blog/base.html" %}
+
+{% block title %}{% if form.instance.pk %}Редактирование{% else %}Создание{% endif %} заявки{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h2>{% if form.instance.pk %}Редактирование{% else %}Создание{% endif %} заявки</h2>
+    </div>
+    <div class="card-body">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <div class="mb-3">
+                {{ form.auditor_company.label_tag }}
+                {{ form.auditor_company }}
+                {% if form.auditor_company.errors %}
+                    <div class="invalid-feedback d-block">
+                        {{ form.auditor_company.errors }}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    {{ form.audit_start.label_tag }}
+                    {{ form.audit_start }}
+                </div>
+                <div class="col-md-6">
+                    {{ form.audit_end.label_tag }}
+                    {{ form.audit_end }}
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                {{ form.file.label_tag }}
+                {{ form.file }}
+                {% if form.file.errors %}
+                    <div class="invalid-feedback d-block">
+                        {{ form.file.errors }}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="mb-3">
+                {{ form.comments.label_tag }}
+                {{ form.comments }}
+            </div>
+            
+            <button type="submit" class="btn btn-primary">
+                {% if form.instance.pk %}Сохранить{% else %}Создать{% endif %}
+            </button>
+            <a href="{% if form.instance.pk %}{% url 'application-detail' form.instance.pk %}{% else %}{% url 'application-list' %}{% endif %}" 
+               class="btn btn-secondary">
+                Отмена
+            </a>
+        </form>
+    </div>
+</div>
+{% endblock %}

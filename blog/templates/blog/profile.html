@@ -1,0 +1,66 @@
+{% extends "blog/base.html" %}
+
+{% block title %}Мой профиль{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h3>Личные данные</h3>
+            </div>
+            <div class="card-body">
+                <p><strong>Имя пользователя:</strong> {{ user.username }}</p>
+                <p><strong>Email:</strong> {{ user.email }}</p>
+                <p><strong>Телефон:</strong> {{ user.phone_number }}</p>
+                <p><strong>Роль:</strong> {{ user.get_role_display }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        {% if user.role == 'Организация' and organization %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3>Информация об организации</h3>
+                </div>
+                <div class="card-body">
+                    <p><strong>Название:</strong> {{ organization.name }}</p>
+                    <p><strong>Адрес:</strong> {{ organization.address }}</p>
+                    <p><strong>ИНН:</strong> {{ organization.inn }}</p>
+                    {% if organization.last_audit_date %}
+                        <p><strong>Последний аудит:</strong> {{ organization.last_audit_date|date:"d.m.Y" }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        {% elif user.role == 'Аудитор' and auditor_company %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3>Информация об аудиторской компании</h3>
+                </div>
+                <div class="card-body">
+                    <p><strong>Название:</strong> {{ auditor_company.name }}</p>
+                    <p><strong>Адрес:</strong> {{ auditor_company.address }}</p>
+                    <p><strong>ОГРН:</strong> {{ auditor_company.ogrn }}</p>
+                    <p><strong>Сертификат:</strong> {{ auditor_company.certificate_number }}</p>
+                    <p><strong>Ответственный:</strong> {{ auditor_company.au_fio }}</p>
+                </div>
+            </div>
+        {% endif %}
+        
+        <div class="card">
+            <div class="card-header">
+                <h3>Последние заявки</h3>
+            </div>
+            <div class="card-body">
+                {% if applications %}
+                    {% include "blog/partials/application_table.html" %}
+                    <a href="{% url 'application-list' %}" class="btn btn-primary mt-3">Все заявки</a>
+                {% else %}
+                    <p>У вас пока нет заявок</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

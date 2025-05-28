@@ -1,0 +1,81 @@
+{% extends "blog/base.html" %}
+
+{% block title %}Заявка #{{ application.id }}{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h2>Заявка #{{ application.id }}</h2>
+        <span class="status-badge status-{{ application.status|lower }}">
+            {{ application.get_status_display }}
+        </span>
+    </div>
+    <div class="card-body">
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <h4>Информация о заявке</h4>
+                <p><strong>Организация:</strong> {{ application.organization.name }}</p>
+                <p><strong>Аудиторская компания:</strong> {{ application.auditor_company.name }}</p>
+                <p><strong>Дата создания:</strong> {{ application.date|date:"d.m.Y H:i" }}</p>
+                {% if application.audit_start %}
+                    <p><strong>Период аудита:</strong> 
+                        {{ application.audit_start|date:"d.m.Y" }} - {{ application.audit_end|date:"d.m.Y" }}
+                    </p>
+                {% endif %}
+            </div>
+            <div class="col-md-6">
+                <h4>Детали</h4>
+                {% if application.comments %}
+                    <p><strong>Комментарии:</strong> {{ application.comments }}</p>
+                {% endif %}
+                {% if application.file %}
+                    <p>
+                        <strong>Файл:</strong> 
+                        <a href="{{ application.file.url }}" target="_blank">Скачать</a>
+                    </p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="mt-4">
+            <h4>Документы</h4>
+            {% if documents %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Название</th>
+                                <th>Тип</th>
+                                <th>Дата загрузки</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for doc in documents %}
+                                <tr>
+                                    <td>{{ doc.name }}</td>
+                                    <td>{{ doc.get_type_display }}</td>
+                                    <td>{{ doc.upload_date|date:"d.m.Y H:i" }}</td>
+                                    <td>
+                                        <a href="{{ doc.file.url }}" class="btn btn-sm btn-primary" download>
+                                            Скачать
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p>Нет прикрепленных документов</p>
+            {% endif %}
+            
+            {% if user == application.organization.user or user == application.auditor_company.user %}
+                <a href="{% url 'document-upload' application.id %}" class="btn btn-success mt-3">
+                    Добавить документ
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends "blog/base.html" %}
+
+{% block title %}Главная{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <div class="card text-white bg-primary mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Организации</h5>
+                <p class="card-text display-4">{{ organizations_count }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-success mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Аудиторы</h5>
+                <p class="card-text display-4">{{ auditors_count }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-info mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Заявки</h5>
+                <p class="card-text display-4">{{ applications_count }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if user.is_authenticated %}
+    <div class="card mt-4">
+        <div class="card-header">
+            Последние заявки
+        </div>
+        <div class="card-body">
+            {% include "blog/partials/application_table.html" with applications=user.applications.all|slice:":5" %}
+            <a href="{% url 'application-list' %}" class="btn btn-primary">Все заявки</a>
+        </div>
+    </div>
+{% endif %}
+{% endblock %}
