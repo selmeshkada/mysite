@@ -25,7 +25,7 @@
                             {{ app.get_status_display }}
                         </span>
                     </td>
-                    <td>{{ app.date|date:"d.m.Y" }}</td>
+                    <td>{{ app.date|date:"Y.m.d" }}</td>
                     <td>
                         <a href="{% url 'application-detail' app.id %}" class="btn btn-sm btn-info">
                             Просмотр

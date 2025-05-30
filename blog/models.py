@@ -81,7 +81,13 @@ class Application(models.Model):
     ]
     
     organization = models.ForeignKey('Organization', on_delete=models.CASCADE, verbose_name="Организация")
-    auditor_company = models.ForeignKey('AuditorCompany', on_delete=models.CASCADE, verbose_name="Аудиторская компания")
+    auditor_company = models.ForeignKey(
+    'AuditorCompany', 
+    on_delete=models.CASCADE, 
+    verbose_name="Аудиторская компания",
+    blank=True,  # Разрешает пустое значение в форме
+    null=True   # Разрешает NULL в базе данных
+)
     status = models.CharField(max_length=15, choices=STATUS_CHOICES, default='На рассмотрении', verbose_name="Статус")
     file = models.FileField(upload_to='applications/', verbose_name="Файл", blank=True, null=True)
     date = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")

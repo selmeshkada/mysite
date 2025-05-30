@@ -5,8 +5,9 @@ from .models import User, Organization, AuditorCompany, Application, Document, N
 
 class CustomUserAdmin(UserAdmin):
     list_display = ('username', 'email', 'phone_number', 'role', 'is_active')
+    list_display_links = ('username',)
     list_filter = ('role', 'is_active')
-    search_fields = ('username', 'email', 'phone_number')
+    search_fields = ('username', 'email', 'phone_number', 'role')
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
         ('Персональная информация', {'fields': ('email', 'phone_number', 'role')}),
@@ -26,6 +27,7 @@ admin.site.register(User, CustomUserAdmin)
 
 class OrganizationAdmin(admin.ModelAdmin):
     list_display = ('name', 'user', 'inn', 'last_audit_status')
+    list_display_links = ('name',)
     list_filter = ('filials', 'legal_cases', 'tax_audits')
     search_fields = ('name', 'inn', 'address')
     raw_id_fields = ('user',)
@@ -36,10 +38,13 @@ class OrganizationAdmin(admin.ModelAdmin):
             return f"Аудит проведен {obj.last_audit_date}"
         return "Аудит не проводился"
 
+    last_audit_status.short_description = "Статус последнего аудита"
+
 admin.site.register(Organization, OrganizationAdmin)
 
 class AuditorCompanyAdmin(admin.ModelAdmin):
     list_display = ('name', 'user', 'ogrn', 'quality_control_status')
+    list_display_links = ('name',)
     list_filter = ('quality_control',)
     search_fields = ('name', 'ogrn', 'certificate_number', 'au_fio')
     raw_id_fields = ('user',)
@@ -47,6 +52,8 @@ class AuditorCompanyAdmin(admin.ModelAdmin):
     @admin.display(description="Контроль качества", boolean=True)
     def quality_control_status(self, obj):
         return obj.quality_control
+
+    quality_control_status.short_description = "Контроль качества"
 
 admin.site.register(AuditorCompany, AuditorCompanyAdmin)
 
@@ -58,6 +65,7 @@ class DocumentInline(admin.TabularInline):
 
 class ApplicationAdmin(admin.ModelAdmin):
     list_display = ('id', 'organization', 'auditor_company', 'status_with_color', 'date', 'audit_duration')
+    list_display_links = ('id', 'organization')
     list_filter = ('status', 'date', 'auditor_company')
     search_fields = ('organization__name', 'auditor_company__name', 'comments')
     raw_id_fields = ('organization', 'auditor_company')
@@ -75,17 +83,22 @@ class ApplicationAdmin(admin.ModelAdmin):
             obj.get_status_display()
         )
     
+    status_with_color.short_description = "Статус заявки"
+
     @admin.display(description="Длительность аудита")
     def audit_duration(self, obj):
         if obj.audit_start and obj.audit_end:
             duration = (obj.audit_end - obj.audit_start).days
             return f"{duration} дней"
         return "Не указано"
+    
+    audit_duration.short_description = "Длительность аудита"
 
 admin.site.register(Application, ApplicationAdmin)
 
 class DocumentAdmin(admin.ModelAdmin):
     list_display = ('name', 'application_link', 'type', 'uploaded_by', 'upload_date')
+    list_display_links = ('name',)
     list_filter = ('type', 'upload_date')
     search_fields = ('name', 'application__id')
     raw_id_fields = ('application', 'uploaded_by')
@@ -99,10 +112,13 @@ class DocumentAdmin(admin.ModelAdmin):
             obj.application.id
         )
 
+    application_link.short_description = "Заявка"
+
 admin.site.register(Document, DocumentAdmin)
 
 class NotificationAdmin(admin.ModelAdmin):
     list_display = ('id', 'user_to', 'short_message', 'is_read', 'sent_date')
+    list_display_links = ('id', 'short_message')
     list_filter = ('is_read', 'sent_date')
     search_fields = ('message', 'user_to__username')
     raw_id_fields = ('user_to',)
@@ -112,13 +128,17 @@ class NotificationAdmin(admin.ModelAdmin):
     @admin.display(description="Сообщение")
     def short_message(self, obj):
         return obj.message[:50] + '...' if len(obj.message) > 50 else obj.message
+    
+    short_message.short_description = "Сообщение"
 
 admin.site.register(Notification, NotificationAdmin)
 
 class AuditLogAdmin(admin.ModelAdmin):
     list_display = ('action_time', 'user', 'table_name', 'record_id', 'action_type')
+    list_display_links = ('action_time', 'table_name')
     list_filter = ('action_type', 'table_name', 'action_time')
     search_fields = ('user__username', 'table_name', 'record_id')
+    raw_id_fields = ('user',)
     date_hierarchy = 'action_time'
     readonly_fields = ('action_time', 'user', 'table_name', 'record_id', 'action_type', 'old_data', 'new_data')
 

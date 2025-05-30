@@ -37,7 +37,7 @@
         </div>
         <div class="card-body">
             {% include "blog/partials/application_table.html" with applications=user.applications.all|slice:":5" %}
-            <a href="{% url 'application-list' %}" class="btn btn-primary">Все заявки</a>
+            <a href="{% url 'blog:application-list' %}" class="btn btn-primary">Все заявки</a>
         </div>
     </div>
 {% endif %}

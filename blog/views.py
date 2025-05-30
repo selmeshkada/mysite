@@ -12,27 +12,29 @@ def home(request):
         'organizations_count': Organization.objects.count(),
         'auditors_count': AuditorCompany.objects.count()
     }
-    return render(request, 'mysite\blog\templates\blog\home.html', context)
+    return render(request, 'blog/home.html', context)
 
 # Список заявок
 class ApplicationListView(LoginRequiredMixin, ListView):
     model = Application
-    template_name = 'blog/templates/blog/application_list.html'
+    template_name = 'blog/application_list.html'
     context_object_name = 'applications'
     paginate_by = 10
 
     def get_queryset(self):
-        user = self.request.user
-        if user.role == 'Организация':
-            return Application.objects.filter(organization__user=user)
-        elif user.role == 'Аудитор':
-            return Application.objects.filter(auditor_company__user=user)
-        return Application.objects.all()
+        if self.request.user.role == 'Организация':
+            return Application.objects.filter(organization__user=self.request.user)
+        elif self.request.user.role == 'Аудитор':
+            return Application.objects.filter(auditor_company__user=self.request.user)
+        return Application.objects.none()
+    def application_list(request):
+        applications = Application.objects.all().order_by('-date')  # Получаем все заявки
+        return render(request, 'application_table.html', {'applications': applications})
 
 # Детали заявки
 class ApplicationDetailView(LoginRequiredMixin, DetailView):
     model = Application
-    template_name = 'blog/templates/blog/application_detail.html'
+    template_name = 'blog/application_detail.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -43,7 +45,7 @@ class ApplicationDetailView(LoginRequiredMixin, DetailView):
 class ApplicationCreateView(LoginRequiredMixin, CreateView):
     model = Application
     form_class = ApplicationForm
-    template_name = 'blog/templates/blog/application_form.html'
+    template_name = 'blog/application_form.html'
 
     def form_valid(self, form):
         form.instance.organization = get_object_or_404(Organization, user=self.request.user)
@@ -53,7 +55,7 @@ class ApplicationCreateView(LoginRequiredMixin, CreateView):
 class ApplicationUpdateView(LoginRequiredMixin, UpdateView):
     model = Application
     form_class = ApplicationForm
-    template_name = 'blog/templates/blog/application_form.html'
+    template_name = 'blog/application_form.html'
 
 # Загрузка документа к заявке
 @login_required
@@ -69,12 +71,12 @@ def upload_document(request, app_id):
             return redirect('application-detail', pk=app_id)
     else:
         form = DocumentForm()
-    return render(request, 'blog/templates/blog/document_upload.html', {'form': form, 'application': application})
+    return render(request, 'blog/document_upload.html', {'form': form, 'application': application})
 
 # Уведомления пользователя
 class NotificationListView(LoginRequiredMixin, ListView):
     model = Notification
-    template_name = 'blog/templates/blog/notification_list.html'
+    template_name = 'blog/notification_list.html'
     context_object_name = 'notifications'
 
     def get_queryset(self):
@@ -101,4 +103,4 @@ def profile(request):
         context['auditor_company'] = get_object_or_404(AuditorCompany, user=user)
         context['applications'] = Application.objects.filter(auditor_company__user=user)[:5]
     
-    return render(request, 'blog/templates/blog/profile.html', context)
+    return render(request, 'blog/profile.html', context)
