@@ -9,7 +9,6 @@ class User(AbstractUser):
         ('Администратор', 'Администратор'),
     ]
     
-    # Переопределяем стандартные поля, чтобы соответствовать вашей БД
     username = models.CharField(max_length=255, unique=True, verbose_name="Логин")
     password = models.CharField(max_length=128, verbose_name="Пароль")  # Django хранит хеш
     email = models.EmailField(unique=True, verbose_name="Email")
@@ -21,7 +20,6 @@ class User(AbstractUser):
     )
     role = models.CharField(max_length=15, choices=ROLE_CHOICES, verbose_name="Роль")
     
-    # Убираем неиспользуемые поля из AbstractUser
     first_name = None
     last_name = None
     
@@ -81,13 +79,7 @@ class Application(models.Model):
     ]
     
     organization = models.ForeignKey('Organization', on_delete=models.CASCADE, verbose_name="Организация")
-    auditor_company = models.ForeignKey(
-    'AuditorCompany', 
-    on_delete=models.CASCADE, 
-    verbose_name="Аудиторская компания",
-    blank=True,  # Разрешает пустое значение в форме
-    null=True   # Разрешает NULL в базе данных
-)
+    auditor_company = models.ForeignKey('AuditorCompany', on_delete=models.CASCADE, verbose_name="Аудиторская компания",)
     status = models.CharField(max_length=15, choices=STATUS_CHOICES, default='На рассмотрении', verbose_name="Статус")
     file = models.FileField(upload_to='applications/', verbose_name="Файл", blank=True, null=True)
     date = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")

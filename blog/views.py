@@ -3,9 +3,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from .models import User, Organization, AuditorCompany, Application, Document, Notification
-from .forms import ApplicationForm, DocumentForm  # Эти формы нужно создать
+from .forms import ApplicationForm, DocumentForm 
 
-# Главная страница (замените на свою логику)
 def home(request):
     context = {
         'applications_count': Application.objects.count(),
@@ -14,7 +13,6 @@ def home(request):
     }
     return render(request, 'blog/home.html', context)
 
-# Список заявок
 class ApplicationListView(LoginRequiredMixin, ListView):
     model = Application
     template_name = 'blog/application_list.html'
@@ -28,10 +26,10 @@ class ApplicationListView(LoginRequiredMixin, ListView):
             return Application.objects.filter(auditor_company__user=self.request.user)
         return Application.objects.none()
     def application_list(request):
-        applications = Application.objects.all().order_by('-date')  # Получаем все заявки
+        applications = Application.objects.all().order_by('-date') 
         return render(request, 'application_table.html', {'applications': applications})
 
-# Детали заявки
+
 class ApplicationDetailView(LoginRequiredMixin, DetailView):
     model = Application
     template_name = 'blog/application_detail.html'
@@ -41,7 +39,7 @@ class ApplicationDetailView(LoginRequiredMixin, DetailView):
         context['documents'] = Document.objects.filter(application=self.object)
         return context
 
-# Создание новой заявки
+
 class ApplicationCreateView(LoginRequiredMixin, CreateView):
     model = Application
     form_class = ApplicationForm
@@ -51,13 +49,11 @@ class ApplicationCreateView(LoginRequiredMixin, CreateView):
         form.instance.organization = get_object_or_404(Organization, user=self.request.user)
         return super().form_valid(form)
 
-# Редактирование заявки
 class ApplicationUpdateView(LoginRequiredMixin, UpdateView):
     model = Application
     form_class = ApplicationForm
     template_name = 'blog/application_form.html'
 
-# Загрузка документа к заявке
 @login_required
 def upload_document(request, app_id):
     application = get_object_or_404(Application, pk=app_id)
@@ -73,7 +69,6 @@ def upload_document(request, app_id):
         form = DocumentForm()
     return render(request, 'blog/document_upload.html', {'form': form, 'application': application})
 
-# Уведомления пользователя
 class NotificationListView(LoginRequiredMixin, ListView):
     model = Notification
     template_name = 'blog/notification_list.html'
@@ -82,7 +77,6 @@ class NotificationListView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         return Notification.objects.filter(user_to=self.request.user).order_by('-sent_date')
 
-# Пометить уведомление как прочитанное
 @login_required
 def mark_notification_read(request, pk):
     notification = get_object_or_404(Notification, pk=pk, user_to=request.user)
@@ -90,7 +84,6 @@ def mark_notification_read(request, pk):
     notification.save()
     return redirect('notification-list')
 
-# Профиль пользователя
 @login_required
 def profile(request):
     user = request.user
