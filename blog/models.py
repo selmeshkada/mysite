@@ -62,7 +62,6 @@ class AuditorCompany(models.Model):
     quality_control = models.BooleanField(default=True, verbose_name="Контроль качества")
     certificate_number = models.CharField(max_length=50, verbose_name="Номер сертификата")
     au_fio = models.CharField(max_length=255, verbose_name="ФИО аудитора")
-    
     class Meta:
         verbose_name = "Аудиторская компания"
         verbose_name_plural = "Аудиторские компании"
@@ -79,7 +78,7 @@ class Application(models.Model):
     ]
     
     organization = models.ForeignKey('Organization', on_delete=models.CASCADE, verbose_name="Организация")
-    auditor_company = models.ForeignKey('AuditorCompany', on_delete=models.CASCADE, verbose_name="Аудиторская компания",)
+    auditor_company = models.ForeignKey('AuditorCompany', on_delete=models.CASCADE, related_name='applications')
     status = models.CharField(max_length=15, choices=STATUS_CHOICES, default='На рассмотрении', verbose_name="Статус")
     file = models.FileField(upload_to='applications/', verbose_name="Файл", blank=True, null=True)
     date = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")

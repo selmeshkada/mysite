@@ -4,12 +4,20 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from .models import User, Organization, AuditorCompany, Application, Document, Notification
 from .forms import ApplicationForm, DocumentForm 
+from django.db.models import Count, Q
+from django.contrib import messages
+
 
 def home(request):
     context = {
-        'applications_count': Application.objects.count(),
         'organizations_count': Organization.objects.count(),
-        'auditors_count': AuditorCompany.objects.count()
+        'auditors_count': AuditorCompany.objects.count(),
+        'applications_count': Application.objects.count(),
+        'latest_applications': Application.objects.order_by('-date')[:5],
+        'top_auditors': AuditorCompany.objects.annotate(
+            completed_count=Count('applications', filter=Q(applications__status='Завершено'))
+        ).order_by('-completed_count')[:5],
+        'user_notifications': Notification.objects.filter(user_to=request.user).order_by('-sent_date')[:5] if request.user.is_authenticated else None
     }
     return render(request, 'blog/home.html', context)
 
@@ -76,10 +84,11 @@ class NotificationListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         return Notification.objects.filter(user_to=self.request.user).order_by('-sent_date')
-
+    
 @login_required
 def mark_notification_read(request, pk):
-    notification = get_object_or_404(Notification, pk=pk, user_to=request.user)
+    """Пометить одно уведомление как прочитанное"""
+    notification = get_object_or_404(Notification, id=pk, user_to=request.user)  # user_to - поле в модели Notification
     notification.is_read = True
     notification.save()
     return redirect('notification-list')
@@ -97,3 +106,16 @@ def profile(request):
         context['applications'] = Application.objects.filter(auditor_company__user=user)[:5]
     
     return render(request, 'blog/profile.html', context)
+
+class AuditorListView(ListView):
+    model = AuditorCompany
+    template_name = 'blog/auditor_list.html'
+    context_object_name = 'auditors'
+    paginate_by = 10
+
+    def get_queryset(self):
+        return AuditorCompany.objects.annotate(
+            completed_count=Count(
+                'applications',
+                filter=Q(applications__status='Завершено')
+        ).order_by('-completed_count'))

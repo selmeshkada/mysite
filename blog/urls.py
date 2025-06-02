@@ -13,4 +13,5 @@ urlpatterns = [
     path('notifications/', views.NotificationListView.as_view(), name='notification-list'),
     path('notifications/<int:pk>/read/', views.mark_notification_read, name='mark-notification-read'),
     path('profile/', views.profile, name='profile'),
+    path('auditors/', views.AuditorListView.as_view(), name='auditor-list'),
 ]

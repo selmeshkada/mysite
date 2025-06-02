@@ -1,0 +1,66 @@
+{% extends "blog/base.html" %}
+
+{% block title %}Аудиторские компании{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Аудиторские компании</h1>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Название</th>
+                        <th>Завершено заявок</th>
+                        <th>Адрес</th>
+                        <th>Контактное лицо</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for auditor in auditors %}
+                    <tr>
+                        <td>{{ auditor.name }}</td>
+                        <td>{{ auditor.completed_count }}</td>
+                        <td>{{ auditor.address }}</td>
+                        <td>{{ auditor.au_fio }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% if is_paginated %}
+<nav class="mt-4">
+    <ul class="pagination">
+        {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Назад</a>
+            </li>
+        {% endif %}
+        
+        {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+                <li class="page-item active">
+                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                </li>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                </li>
+            {% endif %}
+        {% endfor %}
+        
+        {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}">Вперед</a>
+            </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+{% endblock %}

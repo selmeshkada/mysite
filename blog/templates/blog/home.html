@@ -31,14 +31,119 @@
 </div>
 
 {% if user.is_authenticated %}
-    <div class="card mt-4">
-        <div class="card-header">
-            Последние заявки
-        </div>
-        <div class="card-body">
-            {% include "blog/partials/application_table.html" with applications=user.applications.all|slice:":5" %}
-            <a href="{% url 'blog:application-list' %}" class="btn btn-primary">Все заявки</a>
+<div class="row mt-4">
+    <!-- Виджет 1: Последние заявки -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3>Последние заявки на аудит</h3>
+            </div>
+            <div class="card-body">
+                {% if latest_applications %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Номер</th>
+                                    <th>Дата подачи</th>
+                                    <th>Организация</th>
+                                    <th>Статус</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for app in latest_applications %}
+                                    <tr>
+                                        <td><a href="{% url 'blog:application-detail' app.id %}">#{{ app.id }}</a></td>
+                                        <td>{{ app.date|date:"d.m.Y" }}</td>
+                                        <td>{{ app.organization.name }}</td>
+                                        <td>
+                                            <span class="status-badge status-{{ app.status|lower }}">
+                                                {{ app.get_status_display }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="d-flex justify-content-between mt-3">
+                        <a href="{% url 'blog:application-list' %}" class="btn btn-primary">Все заявки</a>
+                        <button class="btn btn-outline-secondary" disabled>Сохранить в избранное</button>
+                    </div>
+                {% else %}
+                    <p>Нет заявок</p>
+                {% endif %}
+            </div>
         </div>
     </div>
+
+    <!-- Виджет 2: ТОП-5 аудиторских компаний -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3>Лучшие аудиторские компании</h3>
+            </div>
+            <div class="card-body">
+                {% if top_auditors %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Название</th>
+                                    <th>Завершено заявок</th>
+                                    <th>Контактное лицо</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for auditor in top_auditors %}
+                                    <tr>
+                                        <td><a href="#">{{ auditor.name }}</a></td>
+                                        <td>{{ auditor.completed_count }}</td>
+                                        <td>{{ auditor.au_fio }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="d-flex justify-content-between mt-3">
+                        <a href="{% url 'blog:auditor-list' %}" class="btn btn-primary">Все аудиторские компании</a>
+                        <button class="btn btn-outline-secondary" disabled>Сохранить в избранное</button>
+                    </div>
+                {% else %}
+                    <p>Нет данных об аудиторских компаниях</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Виджет 3: Уведомления пользователя -->
+    <div class="col-md-12 mt-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3>Мои уведомления</h3>
+            </div>
+            <div class="card-body">
+                {% if user_notifications %}
+                    <div class="list-group">
+                        {% for notification in user_notifications %}
+                            <a href="{% url 'blog:mark-notification-read' notification.id %}" 
+                               class="list-group-item list-group-item-action {% if not notification.is_read %}list-group-item-info{% endif %}">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h5 class="mb-1">{{ notification.message }}</h5>
+                                    <small>{{ notification.sent_date|timesince }} назад</small>
+                                </div>
+                                <small>{% if not notification.is_read %}Новое уведомление{% endif %}</small>
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">
+                        У вас нет уведомлений
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
 {% endif %}
 {% endblock %}
