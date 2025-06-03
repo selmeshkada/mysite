@@ -1,48 +1,30 @@
 {% extends "blog/base.html" %}
 
-{% block title %}Мои заявки{% endblock %}
-
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Мои заявки</h1>
-    {% if user.role == 'Организация' %}
-        <a href="{% url 'blog:application-create' %}" class="btn btn-success">Создать заявку</a>
-    {% endif %}
-</div>
-
-<div class="card">
-    <div class="card-body">
-        {% include "blog/partials/application_table.html" %}
-    </div>
-</div>
-
-{% if is_paginated %}
-    <nav class="mt-4">
-        <ul class="pagination">
-            {% if page_obj.has_previous %}
-                <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Назад</a>
-                </li>
-            {% endif %}
-            
-            {% for num in page_obj.paginator.page_range %}
-                {% if page_obj.number == num %}
-                    <li class="page-item active">
-                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
-                    </li>
-                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
-                    </li>
+<!-- Добавьте этот блок с поиском -->
+<div class="d-flex justify-content-between mb-4">
+    <h2>Мои заявки</h2>
+    <form method="get" class="form-inline">
+        <div class="input-group">
+            <input type="text" 
+                   name="q" 
+                   class="form-control" 
+                   placeholder="Поиск по организациям или аудиторам"
+                   value="{{ request.GET.q }}">
+            <div class="input-group-append">
+                <button class="btn btn-outline-primary" type="submit">
+                    <i class="fas fa-search"></i> Найти
+                </button>
+                {% if request.GET.q %}
+                <a href="{% url 'blog:application-list' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-times"></i> Сбросить
+                </a>
                 {% endif %}
-            {% endfor %}
-            
-            {% if page_obj.has_next %}
-                <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">Вперед</a>
-                </li>
-            {% endif %}
-        </ul>
-    </nav>
-{% endif %}
+            </div>
+        </div>
+    </form>
+</div>
+
+{% include 'blog/partials/application_table.html' %}
+
 {% endblock %}

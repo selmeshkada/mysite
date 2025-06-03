@@ -111,40 +111,68 @@
             </div>
         </div>
     </div>
-
     <div class="col-md-12 mt-4 mb-5"> 
-    <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h3>Мои уведомления</h3>
-        </div>
-        <div class="card-body">
-            {% if user_notifications %}
-                <div class="list-group" style="max-height: 300px; overflow-y: auto;">
-                    {% for notification in user_notifications %}
-                        <a href="{% url 'blog:mark-notification-read' notification.id %}" 
-                           class="list-group-item list-group-item-action {% if not notification.is_read %}list-group-item-info{% endif %}">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1">{{ notification.message }}</h5>
-                                <small>{{ notification.sent_date|timesince }} назад</small>
-                            </div>
-                            {% if not notification.is_read %}
-                                <small class="text-muted">Новое уведомление</small>
-                            {% endif %}
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3>Мои уведомления</h3>
+            </div>
+            <div class="card-body">
+                {% if user_notifications %}
+                    <!-- Добавьте этот скрипт перед списком -->
+                    <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        document.querySelectorAll('.notification-item').forEach(item => {
+                            item.addEventListener('click', function(e) {
+                                e.preventDefault();
+                                const notificationId = this.dataset.id;
+                                const url = "{% url 'blog:mark-notification-read' 0 %}".replace('0', notificationId);
+                                
+                                fetch(url, {
+                                    method: 'POST',
+                                    headers: {
+                                        'X-CSRFToken': '{{ csrf_token }}',
+                                        'X-Requested-With': 'XMLHttpRequest'
+                                    }
+                                })
+                                .then(response => response.json())
+                                .then(data => {
+                                    if(data.status === 'success') {
+                                        this.classList.remove('list-group-item-info');
+                                        this.querySelector('.new-notification-badge').remove();
+                                    }
+                                });
+                            });
+                        });
+                    });
+                    </script>
+                    
+                    <div class="list-group" style="max-height: 300px; overflow-y: auto;">
+                        {% for notification in user_notifications %}
+                            <a href="#" 
+                            class="list-group-item list-group-item-action {% if not notification.is_read %}list-group-item-info{% endif %} notification-item"
+                            data-id="{{ notification.id }}">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h5 class="mb-1">{{ notification.message }}</h5>
+                                    <small>{{ notification.sent_date|timesince }} назад</small>
+                                </div>
+                                {% if not notification.is_read %}
+                                    <small class="new-notification-badge">Новое уведомление</small>
+                                {% endif %}
+                            </a>
+                        {% endfor %}
+                    </div>
+                    <div class="d-flex justify-content-between mt-3">
+                        <a href="{% url 'blog:notification-list' %}" class="btn btn-primary">
+                            Все уведомления
                         </a>
-                    {% endfor %}
-                </div>
-                <div class="d-flex justify-content-between mt-3">
-                    <a href="{% url 'blog:notification-list' %}" class="btn btn-primary">
-                        Все уведомления
-                    </a>
-                </div>
-            {% else %}
-                <div class="alert alert-info mb-0">
-                    У вас нет уведомлений
-                </div>
-            {% endif %}
+                    </div>
+                {% else %}
+                    <div class="alert alert-info mb-0">
+                        У вас нет уведомлений
+                    </div>
+                {% endif %}
+            </div>
         </div>
     </div>
-</div>
 {% endif %}
 {% endblock %}

@@ -6,7 +6,7 @@ from .models import User, Organization, AuditorCompany, Application, Document, N
 from .forms import ApplicationForm, DocumentForm 
 from django.db.models import Count, Q
 from django.contrib import messages
-
+from django.http import JsonResponse
 
 def home(request):
     context = {
@@ -30,6 +30,15 @@ class ApplicationListView(LoginRequiredMixin, ListView):
     paginate_by = 10
 
     def get_queryset(self):
+        query = self.request.GET.get('q')
+        base_queryset = Application.objects.all()
+        
+        if query:
+            base_queryset = base_queryset.filter(
+                Q(organization__name__icontains=query) |
+                Q(auditor_company__name__icontains=query)
+            )
+
         if self.request.user.role == 'Организация':
             return Application.objects.filter(organization__user=self.request.user)
         elif self.request.user.role == 'Аудитор':
@@ -91,10 +100,12 @@ class NotificationListView(LoginRequiredMixin, ListView):
     
 @login_required
 def mark_notification_read(request, pk):
-    """Пометить одно уведомление как прочитанное"""
     notification = get_object_or_404(Notification, id=pk, user_to=request.user)
     notification.is_read = True
     notification.save()
+    
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        return JsonResponse({'status': 'success', 'notification_id': pk})
     return redirect('blog:notification-list')
 
 @login_required
@@ -125,13 +136,22 @@ class AuditorListView(ListView):
             )
         )
         return queryset.order_by('-completed_count')
-
+    
 class ApplicationSearchView(LoginRequiredMixin, ListView):
     template_name = 'blog/application_list.html'
-    
+    context_object_name = 'applications'
+    paginate_by = 10
+
     def get_queryset(self):
-        query = self.request.GET.get('q')
-        return Application.objects.filter(
-            Q(organization__name__icontains=query) |
-            Q(auditor_company__name__icontains=query)
-        ).select_related('organization', 'auditor_company')
+        query = self.request.GET.get('q', '').strip()
+        if query:
+            return Application.objects.filter(
+                Q(organization__name__icontains=query) |
+                Q(auditor_company__name__icontains=query)
+            ).select_related('organization', 'auditor_company').order_by('-date')
+        return Application.objects.none()
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['search_query'] = self.request.GET.get('q', '')
+        return context
