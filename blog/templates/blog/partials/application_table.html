@@ -19,12 +19,14 @@
                             {{ app.get_status_display }}
                         </span>
                     </td>
-                    <td>{{ app.date|date:"Y.m.d" }}</td>
+                    <td>{{ app.date|date:"d.m.Y" }}</td>
                     <td>
                         <a href="{% url 'blog:application-detail' app.id %}" 
                            class="btn btn-sm btn-outline-primary">
                             Просмотр
                         </a>
+                        <!-- <a href="{% url 'blog:application-update' app.id %}" class="btn btn-warning btn-sm">Редактировать</a>
+                        <a href="{% url 'blog:application-delete' app.id %}" class="btn btn-danger btn-sm">Удалить</a> -->
                     </td>
                 </tr>
             {% empty %}

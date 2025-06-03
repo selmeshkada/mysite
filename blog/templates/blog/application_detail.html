@@ -17,6 +17,12 @@
                 <p><strong>Организация:</strong> {{ application.organization.name }}</p>
                 <p><strong>Аудиторская компания:</strong> {{ application.auditor_company.name }}</p>
                 <p><strong>Дата создания:</strong> {{ application.date|date:"d.m.Y H:i" }}</p>
+                {% if request.user == application.organization.user or request.user.role == 'Администратор' %}
+                <div class="mt-3">
+                    <a href="{% url 'blog:application-update' app.id %}" class="btn btn-warning">Редактировать</a>
+                    <a href="{% url 'blog:application-delete' app.id %}" class="btn btn-danger">Удалить</a>
+                </div>
+                {% endif %}
                 {% if application.audit_start %}
                     <p><strong>Период аудита:</strong> 
                         {{ application.audit_start|date:"d.m.Y" }} - {{ application.audit_end|date:"d.m.Y" }}
@@ -69,12 +75,9 @@
             {% else %}
                 <p>Нет прикрепленных документов</p>
             {% endif %}
-            
-            {% if user == application.organization.user or user == application.auditor_company.user %}
-                <a href="{% url 'blog:document-upload' application.id %}" class="btn btn-success mt-3">
-                    Добавить документ
-                </a>
-            {% endif %}
+            <a href="{% url 'blog:document-upload' application.id %}" class="btn btn-success mt-3">
+                Добавить документ
+            </a>
         </div>
     </div>
 </div>

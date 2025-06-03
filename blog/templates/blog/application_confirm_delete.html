@@ -1,0 +1,13 @@
+{% extends "blog/base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Удаление заявки #{{ object.id }}</h2>
+    <p>Вы уверены, что хотите удалить заявку от <strong>{{ object.organization.name }}</strong>?</p>
+
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Удалить</button>
+        <a href="{% url 'blog:application-list' %}" class="btn btn-secondary">Отмена</a>
+    </form>
+</div>
+{% endblock %}

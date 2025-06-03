@@ -30,6 +30,28 @@
     </div>
 </div>
 
+<div class="row">
+    <div class="col-md-4">
+        <div class="card text-white bg-dark mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Процент завершённых заявок</h5>
+                <div class="d-flex align-items-center">
+                    <p class="card-text display-4 mr-2">{{ completed_percentage }}%</p>
+                    <div class="progress" style="height: 16px; width: 100%">
+                        <div class="progress-bar bg-success" 
+                             role="progressbar" 
+                             style="width: var(--completed-percentage);" 
+                             aria-valuenow="{{ completed_percentage }}" 
+                             aria-valuemin="0" 
+                             aria-valuemax="100">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% if user.is_authenticated %}
 <div class="row mt-4">
     <div class="col-md-6">
@@ -118,7 +140,6 @@
             </div>
             <div class="card-body">
                 {% if user_notifications %}
-                    <!-- Добавьте этот скрипт перед списком -->
                     <script>
                     document.addEventListener('DOMContentLoaded', function() {
                         document.querySelectorAll('.notification-item').forEach(item => {

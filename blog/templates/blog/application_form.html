@@ -50,10 +50,7 @@
             <button type="submit" class="btn btn-primary">
                 {% if form.instance.pk %}Сохранить{% else %}Создать{% endif %}
             </button>
-            <a href="{% if form.instance.pk %}{% url 'blog:application-detail' form.instance.pk %}{% else %}{% url 'blog:application-list' %}{% endif %}" 
-               class="btn btn-secondary">
-                Отмена
-            </a>
+            <a href="{% url 'blog:application-list' %}" class="btn btn-secondary">Отмена</a>
         </form>
     </div>
 </div>

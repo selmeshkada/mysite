@@ -7,11 +7,11 @@
         <div class="input-group">
             <input type="text" 
                    name="q" 
-                   class="form-control" 
-                   placeholder="Поиск по организациям или аудиторам"
+                   class="form-control mr-2" 
+                   placeholder="Поиск по организациям"
                    value="{{ request.GET.q }}">
             <div class="input-group-append">
-                <button class="btn btn-outline-primary" type="submit">
+                <button class="btn btn-outline-primary mr-2" type="submit">
                     <i class="fas fa-search"></i> Найти
                 </button>
                 {% if request.GET.q %}
