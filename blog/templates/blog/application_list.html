@@ -6,7 +6,7 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1>Мои заявки</h1>
     {% if user.role == 'Организация' %}
-        <a href="{% url 'application-create' %}" class="btn btn-success">Создать заявку</a>
+        <a href="{% url 'blog:application-create' %}" class="btn btn-success">Создать заявку</a>
     {% endif %}
 </div>
 

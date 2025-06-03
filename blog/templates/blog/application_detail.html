@@ -71,7 +71,7 @@
             {% endif %}
             
             {% if user == application.organization.user or user == application.auditor_company.user %}
-                <a href="{% url 'document-upload' application.id %}" class="btn btn-success mt-3">
+                <a href="{% url 'blog:document-upload' application.id %}" class="btn btn-success mt-3">
                     Добавить документ
                 </a>
             {% endif %}

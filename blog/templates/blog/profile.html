@@ -55,7 +55,7 @@
             <div class="card-body">
                 {% if applications %}
                     {% include "blog/partials/application_table.html" %}
-                    <a href="{% url 'application-list' %}" class="btn btn-primary mt-3">Все заявки</a>
+                    <a href="{% url 'blog:application-list' %}" class="btn btn-primary mt-3">Все заявки</a>
                 {% else %}
                     <p>У вас пока нет заявок</p>
                 {% endif %}

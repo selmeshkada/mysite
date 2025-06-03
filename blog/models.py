@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinLengthValidator, RegexValidator
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 class User(AbstractUser):
     ROLE_CHOICES = [
@@ -10,7 +12,7 @@ class User(AbstractUser):
     ]
     
     username = models.CharField(max_length=255, unique=True, verbose_name="Логин")
-    password = models.CharField(max_length=128, verbose_name="Пароль")  # Django хранит хеш
+    password = models.CharField(max_length=128, verbose_name="Пароль")
     email = models.EmailField(unique=True, verbose_name="Email")
     phone_number = models.CharField(
         max_length=11,
@@ -78,7 +80,7 @@ class Application(models.Model):
     ]
     
     organization = models.ForeignKey('Organization', on_delete=models.CASCADE, verbose_name="Организация")
-    auditor_company = models.ForeignKey('AuditorCompany', on_delete=models.CASCADE, related_name='applications')
+    auditor_company = models.ForeignKey('AuditorCompany', on_delete=models.CASCADE, related_name='applications', null=True, blank=True)
     status = models.CharField(max_length=15, choices=STATUS_CHOICES, default='На рассмотрении', verbose_name="Статус")
     file = models.FileField(upload_to='applications/', verbose_name="Файл", blank=True, null=True)
     date = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
@@ -165,3 +167,26 @@ class AuditLog(models.Model):
     
     def __str__(self):
         return f"{self.get_action_type_display()} в {self.table_name}"
+    
+@receiver(post_save, sender=Application)
+def send_notification_on_status_change(sender, instance, **kwargs):
+    if kwargs.get('created', False):
+        # Уведомление при создании заявки
+        Notification.objects.create(
+            user_to=instance.auditor_company.user,
+            message=f'Новая заявка #{instance.id} от {instance.organization.name}'
+        )
+    else:
+        # Уведомление при изменении статуса
+        if instance.status == 'Завершено':
+            Notification.objects.create(
+                user_to=instance.organization.user,
+                message=f'Заявка #{instance.id} завершена'
+            )
+
+@receiver(post_save, sender=Application)
+def update_last_audit_date(sender, instance, **kwargs):
+    if instance.status == 'Завершено' and instance.audit_end:
+        Organization.objects.filter(id=instance.organization.id).update(
+            last_audit_date=instance.audit_end
+        )

@@ -13,11 +13,13 @@ def home(request):
         'organizations_count': Organization.objects.count(),
         'auditors_count': AuditorCompany.objects.count(),
         'applications_count': Application.objects.count(),
-        'latest_applications': Application.objects.order_by('-date')[:5],
+        'latest_applications': Application.objects.select_related(
+            'organization', 'auditor_company'
+            ).order_by('-date')[:10],
         'top_auditors': AuditorCompany.objects.annotate(
             completed_count=Count('applications', filter=Q(applications__status='Завершено'))
-        ).order_by('-completed_count')[:5],
-        'user_notifications': Notification.objects.filter(user_to=request.user).order_by('-sent_date')[:5] if request.user.is_authenticated else None
+        ).filter(completed_count__gt=0).order_by('-completed_count')[:10],
+        'user_notifications': Notification.objects.filter(user_to=request.user).order_by('-sent_date')[:10] if request.user.is_authenticated else None
     }
     return render(request, 'blog/home.html', context)
 
@@ -32,6 +34,8 @@ class ApplicationListView(LoginRequiredMixin, ListView):
             return Application.objects.filter(organization__user=self.request.user)
         elif self.request.user.role == 'Аудитор':
             return Application.objects.filter(auditor_company__user=self.request.user)
+        elif self.request.user.role == 'Администратор':
+            return Application.objects.all()
         return Application.objects.none()
     def application_list(request):
         applications = Application.objects.all().order_by('-date') 
@@ -88,10 +92,10 @@ class NotificationListView(LoginRequiredMixin, ListView):
 @login_required
 def mark_notification_read(request, pk):
     """Пометить одно уведомление как прочитанное"""
-    notification = get_object_or_404(Notification, id=pk, user_to=request.user)  # user_to - поле в модели Notification
+    notification = get_object_or_404(Notification, id=pk, user_to=request.user)
     notification.is_read = True
     notification.save()
-    return redirect('notification-list')
+    return redirect('blog:notification-list')
 
 @login_required
 def profile(request):
@@ -100,10 +104,10 @@ def profile(request):
     
     if user.role == 'Организация':
         context['organization'] = get_object_or_404(Organization, user=user)
-        context['applications'] = Application.objects.filter(organization__user=user)[:5]
+        context['applications'] = Application.objects.filter(organization__user=user)[:10]
     elif user.role == 'Аудитор':
         context['auditor_company'] = get_object_or_404(AuditorCompany, user=user)
-        context['applications'] = Application.objects.filter(auditor_company__user=user)[:5]
+        context['applications'] = Application.objects.filter(auditor_company__user=user)[:10]
     
     return render(request, 'blog/profile.html', context)
 
@@ -114,8 +118,20 @@ class AuditorListView(ListView):
     paginate_by = 10
 
     def get_queryset(self):
-        return AuditorCompany.objects.annotate(
+        queryset = AuditorCompany.objects.annotate(
             completed_count=Count(
                 'applications',
                 filter=Q(applications__status='Завершено')
-        ).order_by('-completed_count'))
+            )
+        )
+        return queryset.order_by('-completed_count')
+
+class ApplicationSearchView(LoginRequiredMixin, ListView):
+    template_name = 'blog/application_list.html'
+    
+    def get_queryset(self):
+        query = self.request.GET.get('q')
+        return Application.objects.filter(
+            Q(organization__name__icontains=query) |
+            Q(auditor_company__name__icontains=query)
+        ).select_related('organization', 'auditor_company')
