@@ -24,31 +24,35 @@ def home(request):
     return render(request, 'blog/home.html', context)
 
 class ApplicationListView(LoginRequiredMixin, ListView):
-    model = Application
     template_name = 'blog/application_list.html'
     context_object_name = 'applications'
     paginate_by = 10
 
     def get_queryset(self):
-        query = self.request.GET.get('q')
-        base_queryset = Application.objects.all()
+        queryset = Application.objects.select_related('organization', 'auditor_company').order_by('-date')
         
+        # Фильтрация по роли пользователя
+        if self.request.user.role == 'Организация':
+            queryset = queryset.filter(organization__user=self.request.user)
+        elif self.request.user.role == 'Аудитор':
+            queryset = queryset.filter(auditor_company__user=self.request.user)
+        elif self.request.user.role != 'Администратор':
+            queryset = Application.objects.none()
+        
+        # Добавляем поддержку поиска
+        query = self.request.GET.get('q', '').strip()
         if query:
-            base_queryset = base_queryset.filter(
+            queryset = queryset.filter(
                 Q(organization__name__icontains=query) |
                 Q(auditor_company__name__icontains=query)
             )
-
-        if self.request.user.role == 'Организация':
-            return Application.objects.filter(organization__user=self.request.user)
-        elif self.request.user.role == 'Аудитор':
-            return Application.objects.filter(auditor_company__user=self.request.user)
-        elif self.request.user.role == 'Администратор':
-            return Application.objects.all()
-        return Application.objects.none()
-    def application_list(request):
-        applications = Application.objects.all().order_by('-date') 
-        return render(request, 'application_table.html', {'applications': applications})
+        
+        return queryset
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['search_query'] = self.request.GET.get('q', '')
+        return context
 
 
 class ApplicationDetailView(LoginRequiredMixin, DetailView):
@@ -144,12 +148,15 @@ class ApplicationSearchView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         query = self.request.GET.get('q', '').strip()
+        base_queryset = Application.objects.select_related('organization', 'auditor_company').order_by('-date')
+        
         if query:
-            return Application.objects.filter(
+            return base_queryset.filter(
                 Q(organization__name__icontains=query) |
                 Q(auditor_company__name__icontains=query)
-            ).select_related('organization', 'auditor_company').order_by('-date')
-        return Application.objects.none()
+            )
+        
+        return base_queryset
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
