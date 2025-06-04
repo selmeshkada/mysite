@@ -110,17 +110,24 @@ class ApplicationUpdateView(LoginRequiredMixin, UpdateView):
 @login_required
 def upload_document(request, app_id):
     application = get_object_or_404(Application, pk=app_id)
+    documents = Document.objects.filter(application=application)    
     if request.method == 'POST':
         form = DocumentForm(request.POST, request.FILES)
         if form.is_valid():
             document = form.save(commit=False)
             document.application = application
             document.uploaded_by = request.user
-            document.save()
+            document.save()  # Правильное сохранение документа
+            messages.success(request, 'Документ успешно загружен')
             return redirect('blog:application-detail', pk=app_id)
     else:
         form = DocumentForm()
-    return render(request, 'blog/document_upload.html', {'form': form, 'application': application})
+    
+    return render(request, 'blog/document_upload.html', {
+        'form': form,
+        'application': application,
+        'documents': documents,  # Передаем список документов
+    })
 
 class NotificationListView(LoginRequiredMixin, ListView):
     model = Notification
