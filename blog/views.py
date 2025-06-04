@@ -8,7 +8,7 @@ from django.db.models import Count, Q, Avg, Case, When, FloatField
 from django.contrib import messages
 from django.http import JsonResponse
 from django.views.generic import DeleteView
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 
 def home(request):
     completed_percentage = Application.objects.aggregate(
@@ -90,9 +90,23 @@ class ApplicationUpdateView(LoginRequiredMixin, UpdateView):
     model = Application
     form_class = ApplicationForm
     template_name = 'blog/application_form.html'
-    success_url = reverse_lazy('blog:application-list')
 
-    
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        # Убедимся, что форма инициализирована с текущими данными
+        kwargs['instance'] = self.get_object()
+        return kwargs
+
+    def form_valid(self, form):
+        # Сохраняем форму и возвращаем успешный ответ
+        self.object = form.save()
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        # Перенаправляем на ту же страницу с обновленными данными
+        return reverse('blog:application-detail', kwargs={'pk': self.object.pk})
+
+
 @login_required
 def upload_document(request, app_id):
     application = get_object_or_404(Application, pk=app_id)
@@ -103,7 +117,7 @@ def upload_document(request, app_id):
             document.application = application
             document.uploaded_by = request.user
             document.save()
-            return redirect('application-detail', pk=app_id)
+            return redirect('blog:application-detail', pk=app_id)
     else:
         form = DocumentForm()
     return render(request, 'blog/document_upload.html', {'form': form, 'application': application})

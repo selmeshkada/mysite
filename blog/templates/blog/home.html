@@ -1,13 +1,16 @@
 {% extends "blog/base.html" %}
-
+{% load static %} 
 {% block title %}Главная{% endblock %}
-
+{% block head %}
+<link rel="stylesheet" href="{% static 'blog/css/home.css' %}?v=2">
+{% endblock %}
 {% block content %}
 <div class="row">
     <div class="col-md-4">
         <div class="card text-white bg-primary mb-3">
             <div class="card-body">
                 <h5 class="card-title">Организации</h5>
+                <img src="{% static 'blog/css/org.svg' %}" alt="org" class="icon" style="width: 40px; height: 40px; position: absolute; bottom: 10px; right: 10px;">
                 <p class="card-text display-4">{{ organizations_count }}</p>
             </div>
         </div>
@@ -16,6 +19,7 @@
         <div class="card text-white bg-success mb-3">
             <div class="card-body">
                 <h5 class="card-title">Аудиторы</h5>
+                <img src="{% static 'blog/css/audit.svg' %}" alt="org" class="icon" style="width: 40px; height: 40px; position: absolute; bottom: 10px; right: 10px;">
                 <p class="card-text display-4">{{ auditors_count }}</p>
             </div>
         </div>
@@ -24,6 +28,7 @@
         <div class="card text-white bg-info mb-3">
             <div class="card-body">
                 <h5 class="card-title">Заявки</h5>
+                <img src="{% static 'blog/css/applic.svg' %}" alt="org" class="icon" style="width: 40px; height: 40px; position: absolute; bottom: 10px; right: 10px;">
                 <p class="card-text display-4">{{ applications_count }}</p>
             </div>
         </div>

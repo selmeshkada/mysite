@@ -20,7 +20,13 @@
                     </div>
                 {% endif %}
             </div>
-            
+            <div class="mb-3">
+                {% if application.audit_start %}
+                    <p>Период аудита:
+                        {{ application.audit_start|date:"d.m.Y" }} - {{ application.audit_end|date:"d.m.Y" }}
+                    </p>
+                {% endif %}
+            </div>
             <div class="row mb-3">
                 <div class="col-md-6">
                     {{ form.audit_start.label_tag }}

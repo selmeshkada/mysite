@@ -1,0 +1,174 @@
+/* Общие стили для карточки заявки */
+body {
+    background-color: red !important;
+}
+.card {
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+    border: none;
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 1.25rem 1.5rem;
+}
+
+.card-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: #343a40;
+}
+
+.card-body {
+    padding: 2rem;
+}
+
+/* Стили для статусных бейджей */
+.status-badge {
+    padding: 0.35rem 0.65rem;
+    border-radius: 50rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-новый {
+    background-color: #d1ecf1;
+    color: #0c5460;
+}
+
+.status-в работе {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.status-завершено {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.status-отклонено {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* Стили для секций информации */
+.row.mb-4 {
+    margin-bottom: 2rem !important;
+}
+
+h4 {
+    color: #495057;
+    margin-bottom: 1.2rem;
+    font-size: 1.25rem;
+    border-bottom: 2px solid #e9ecef;
+    padding-bottom: 0.5rem;
+}
+
+p strong {
+    color: #495057;
+    min-width: 150px;
+    display: inline-block;
+}
+
+/* Стили для кнопок */
+.btn {
+    border-radius: 6px;
+    font-weight: 500;
+    padding: 0.5rem 1.1rem;
+    margin-right: 0.5rem;
+    transition: all 0.2s;
+}
+
+.btn-warning {
+    background-color: #ffc107;
+    border-color: #ffc107;
+    color: #212529;
+}
+
+.btn-warning:hover {
+    background-color: #e0a800;
+    border-color: #d39e00;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+    border-color: #bd2130;
+}
+
+.btn-success {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+.btn-success:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.btn-primary:hover {
+    background-color: #0069d9;
+    border-color: #0062cc;
+}
+
+.btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+
+/* Стили для таблицы документов */
+.table-responsive {
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.table {
+    margin-bottom: 1rem;
+    background-color: #fff;
+}
+
+.table thead th {
+    background-color: #f8f9fa;
+    border-bottom-width: 1px;
+    font-weight: 600;
+    color: #495057;
+    padding: 1rem;
+}
+
+.table tbody td {
+    padding: 0.75rem 1rem;
+    vertical-align: middle;
+    border-top: 1px solid #e9ecef;
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(0, 0, 0, 0.03);
+}
+
+/* Адаптивные стили */
+@media (max-width: 768px) {
+    .card-body {
+        padding: 1.5rem;
+    }
+    
+    .row.mb-4 > div {
+        margin-bottom: 1.5rem;
+    }
+    
+    p strong {
+        min-width: 120px;
+    }
+}

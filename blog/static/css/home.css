@@ -1,0 +1,4 @@
+.row .col-md-4 .card .card-body img.icon {
+    max-width: 15% !important;    /* Занимает 15% ширины карточки */
+    height: auto !important;      /* Автоматическая высота */
+}
