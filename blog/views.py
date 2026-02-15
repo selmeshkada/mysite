@@ -10,6 +10,11 @@ from django.http import JsonResponse
 from django.views.generic import DeleteView
 from django.urls import reverse_lazy, reverse
 
+
+def login_page(request):
+    return render(request, 'blog/login.html')
+
+
 def home(request):
     completed_percentage = Application.objects.aggregate(
         avg_completed=Avg(

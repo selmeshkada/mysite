@@ -1,0 +1,132 @@
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация</title>
+    <link rel="stylesheet" href="/static/css/login.css?v=2">
+</head>
+
+<body>
+    <div class="container">
+        <!-- Шапка -->
+        <header class="header">
+            <div class="logo">
+                <div class="logo-box"><img src="/static/blog/images/logo_FIN.svg" alt="logo"></div>
+            </div>
+        </header>
+
+        <!-- Основной контент -->
+        <main class="main-content">
+            <div class="registration-container">
+                <form class="registration-form">
+                    <h1 class="registration-title">Регистрация</h1>
+                    <div class="trial-badge">
+                        14 дней бесплатного пробного тарифа "Базовый"
+                    </div>
+                    <!-- Имя и Фамилия в одной строке -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="first_name">Имя</label>
+                            <input type="text" id="first_name" class="form-input" placeholder="Имя">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="last_name">Фамилия</label>
+                            <input type="text" id="last_name" class="form-input" placeholder="Фамилия">
+                        </div>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" class="form-input" placeholder="email@example.com">
+                    </div>
+
+                    <!-- Пароль -->
+                    <div class="form-group">
+                        <label for="password">Пароль</label>
+                        <input type="password" id="password" class="form-input" placeholder="••••••••">
+                    </div>
+
+                    <!-- Согласие -->
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="agreement">
+                        <label for="agreement">Согласен(-на) на обработку персональных данных</label>
+                    </div>
+
+                    <!-- Кнопка -->
+                    <button type="submit" class="register-btn">Начать</button>
+
+                    <!-- Разделитель -->
+                    <div class="divider">
+                        <span>Или войдите через:</span>
+                    </div>
+
+                    <!-- Социальные кнопки -->
+                    <div class="social-login">
+                        <button type="button" class="social-btn">
+                            <img src="/static/blog/images/google.svg" alt="Google" class="social-icon">
+                            Google
+                        </button>
+                        <button type="button" class="social-btn">
+                            <img src="/static/blog/images/gosuslugi.svg" alt="Email" class="social-icon">
+                            Госуслуги
+                        </button>
+                        <button type="button" class="social-btn">
+                            <img src="/static/blog/images/vk.svg" alt="VK" class="social-icon">
+                            ВК
+                        </button>
+                    </div>
+
+                    <!-- Ссылка на вход -->
+                    <div class="login-link">
+                        Уже есть аккаунт? <a href="#">Войти</a>
+                    </div>
+                </form>
+            </div>
+        </main>
+        <!-- Футер -->
+        <footer class="footer">
+            <div class="podpiska">
+                <div class="logo-box-fotter"><img src="/static/blog/images/logo_grey.svg" alt="logo"></div>
+                <div class="input-rassilka">
+                    <input type="email" id="email" class="form-input" placeholder="Получайте актуальную информацию">
+                    <button>Подписаться</button>
+                </div>
+            </div>
+            <div class="footer-content">
+                <div class="nav-links">
+                    <h3>Информация:</h3>
+                    <p><a href="#">О сервисе</a></p>
+                    <p><a href="#">Тарифы</a></p>
+                    <p><a href="#">Справочная</a></p>
+                    <p><a href="#">Поддержка</a></p>
+                </div>
+                <div class="footer-contacts">
+                    <h3>Контакты</h3>
+                    <p>Телефон: +7 (499) 605-20-00</p>
+                    <p>Email: fin@gmail.com</p>
+                </div>
+                <div class="footer-social">
+                    <div class="apps"><img src="/static/blog/images/app_store.svg" alt="app">
+                        <img src="/static/blog/images/google_play.svg" alt="google_play">
+                    </div>
+                    <div class="social-links">
+                        <h3>Соцсети:</h3>
+                        <div class="social-icons">
+                            <div class="icon"><img src="/static/blog/images/rutube.svg" alt="rutube"></div>
+                            <div class="icon"><img src="/static/blog/images/tg.svg" alt="tg"></div>
+                            <div class="icon"><img src="/static/blog/images/vk_white.svg" alt="vk_white"></div>
+                            <div class="icon"><img src="/static/blog/images/yandex_zen.svg" alt="zen"></div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="prava">@ Все права защищены.</div>
+        </footer>
+    </div>
+</body>
+
+</html>

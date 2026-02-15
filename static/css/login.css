@@ -1,0 +1,453 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: #f5f5f5;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Шапка */
+.header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e0e0e0;
+    margin-bottom: 40px;
+}
+
+.logo-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logo-box img {
+    width: 90%;
+    object-fit: contain;
+}
+
+.main-content {
+    border-bottom: 1px solid #d9dbdf;
+}
+
+/* Основной контент */
+.registration-container {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.registration-title {
+    text-align: center;
+    font-size: 32px;
+    color: #333;
+    font-weight: 600;
+}
+
+.trial-badge {
+    text-align: center;
+    padding-bottom: 20px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.registration-form {
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #555;
+    font-size: 14px;
+}
+
+.form-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    font-size: 16px;
+    transition: all 0.3s;
+    background: #f8f9fa;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #cc6666;
+    background: white;
+}
+
+.form-input::placeholder {
+    color: #aaa;
+}
+
+.checkbox-group {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 25px;
+}
+
+.checkbox-group input[type="checkbox"] {
+    cursor: pointer;
+    accent-color: #cc6666;
+}
+
+.checkbox-group label {
+    font-size: 14px;
+    color: #666;
+    cursor: pointer;
+}
+
+/* Кнопка регистрации */
+
+.register-btn {
+    width: 100%;
+    padding: 14px 24px;
+    background-color: #cc6666;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 0 0 0 transparent;
+}
+
+.register-btn:hover, .input-rassilka button:hover {
+    color: #cc6666;
+    background-color: #ffffff;
+    box-shadow: 0 0 0 2px #cc6666;
+}
+
+.register-btn:active {
+    transform: translateY(0);
+}
+
+/* Разделитель */
+.divider {
+    position: relative;
+    text-align: center;
+    margin: 25px 0;
+}
+
+.divider::before,
+.divider::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: calc(50% - 70px);
+    height: 1px;
+    background: #e0e0e0;
+}
+
+.divider::before {
+    left: 0;
+}
+
+.divider::after {
+    right: 0;
+}
+
+.divider span {
+    background: white;
+    padding: 0 15px;
+    color: #999;
+    font-size: 14px;
+}
+
+.logo-box-fotter {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logo-box-fotter img {
+    width: 90%;
+}
+
+
+.social-login {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.social-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px;
+    border: 2px solid #0066cc;
+    border-radius: 12px;
+    background: white;
+    color: #0066cc;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.social-btn:hover {
+    border-color: #cc6666;
+    transform: translateY(-2px);
+}
+
+.social-icon {
+    width: 20px;
+    height: 20px;
+}
+
+/* Ссылка на вход */
+
+.login-link {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 14px;
+}
+
+.login-link a {
+    color: #4a90e2;
+    text-decoration: none;
+    font-weight: 500;
+    margin-left: 10px;
+}
+
+.login-link a:hover {
+    text-decoration: none;
+    color: #cc6666;
+}
+
+/* Адаптивность */
+@media (max-width: 500px) {
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    .social-login {
+        grid-template-columns: 1fr;
+    }
+
+    .registration-container {
+        padding: 10px;
+    }
+
+    .registration-form {
+        padding: 20px;
+    }
+}
+
+/* Анимация появления */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.registration-container {
+    animation: fadeInUp 0.6s ease;
+}
+
+
+/* Навигация */
+.navigation {
+    display: flex;
+    justify-content: space-between;
+    padding: 30px 0;
+    margin-bottom: 40px;
+}
+
+.nav-links a {
+    color: #555;
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.3s;
+}
+
+.nav-links a:hover {
+    color: #4a90e2;
+}
+
+/* Футер */
+.footer {
+    background-color: #f8f9fa;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.footer-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 40px;
+    padding: 0 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+
+.footer p {
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.footer h3 {
+    color: #333;
+    font-size: 16px;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+.podpiska {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.input-rassilka {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    
+}
+
+.input-rassilka input {
+    width: 380px;
+    height: 40px;
+    border-radius: 12px;
+    background-color: #D9D9D9;
+    border: none;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+    font-size: 14px;
+}
+
+.input-rassilka input::placeholder {
+    color:#697077;
+}
+
+.input-rassilka button {
+    color:#000000;
+    background-color: #cc6666;
+    border-radius: 12px;
+    height: 40px;
+    width: 140px;
+    border: none;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.3s;
+}
+
+.apps {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
+    padding-bottom: 10px;
+}
+
+.apps img {
+    width: 40%;
+}
+
+.social-icons {
+    display: flex;
+    align-items: center;
+}
+
+.social-icons img {
+    filter: invert(60%) sepia(90%) saturate(2200%) hue-rotate(190deg) brightness(90%) contrast(90%);
+    width: 60%;
+}
+
+.social-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    transition: background-color 0.3s;
+}
+
+.prava {
+    padding-left: 30px;
+    padding-bottom: 30px;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+
+    .navigation {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .nav-links {
+        justify-content: center;
+    }
+
+    .footer-content {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+
+    .footer-left {
+        align-items: center;
+        text-align: center;
+    }
+
+    .social-icons {
+        justify-content: center;
+    }
+}
