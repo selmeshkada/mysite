@@ -11,6 +11,10 @@ from django.views.generic import DeleteView
 from django.urls import reverse_lazy, reverse
 
 
+def reg_page(request):
+    return render(request, 'blog/reg.html')
+
+
 def login_page(request):
     return render(request, 'blog/login.html')
 

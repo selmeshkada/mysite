@@ -117,29 +117,6 @@ body {
     margin-bottom: 25px;
 }
 
-.registration-container .remember {
-    display: flex;
-    justify-content: space-between;
-    padding-left: 10px;
-    padding-right: 10px;
-}
-
-.link-remember a{
-    color: #4a90e2;
-    text-decoration: none;
-    font-size: 14px;
-    font-weight: 500;
-    margin-left: 10px;
-}
-
-.link-remember a:hover{
-    color: #cc6666;
-    text-decoration: none;
-    font-size: 14px;
-    font-weight: 500;
-    margin-left: 10px;
-}
-
 .checkbox-group input[type="checkbox"] {
     cursor: pointer;
     accent-color: #cc6666;
