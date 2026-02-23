@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/css/landing.css?v=2">
+</head>
+
+<body>
+
+    <div class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <img src="/static/blog/images/logo_FIN_white.svg" alt="logo_white">
+            </div>
+
+            <div class="nav-menu">
+                <div class="nav-links">
+                    <a href="#">О сервисе</a>
+                    <a href="#">Тарифы</a>
+                    <a href="#">Справочная</a>
+                </div>
+
+                <div class="nav-buttons">
+                    <a href="{% url 'blog:login' %}" class="btn">Войти</a>
+                    <a href="{% url 'blog:reg' %}" class="btn">Зарегистрироваться</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="hero-section">
+        <div class="hero-container">
+            <div class="hero-content">
+                <h1 class="hero-title">
+                    Бережно ведём учёт,<br>пока вы делаете то,<br>что любите
+                </h1>
+                <p class="hero-text">
+                    Попробуйте сервис бесплатно и получите скидку 20%<br>на год пользования базовым тарифом
+                </p>
+                <a href="{% url 'blog:reg' %}" class="btn">Попробовать бесплатно</a>
+            </div>
+            <div class="hero-image">
+                <img src="/static/blog/images/land_one.png" alt="Учет финансов">
+            </div>
+        </div>
+    </div>
+
+    <div class="power-section">
+        <div class="power-container">
+            <h1 class="hero-title-24px">
+                Преимущества
+            </h1>
+            <div class="cards">
+                <div class="item">
+                    <img src="/static/blog/images/land_two.png" alt="land_one">
+                    <h3>Актуальные данные</h3>
+                </div>
+                <div class="item-short">
+                    <img src="/static/blog/images/land_three.png" alt="land_two">
+                    <h3>Защищено шифрованием</h3>
+                </div>
+                <div class="item">
+                    <img src="/static/blog/images/land_four.png" alt="land_three">
+                    <h3>Синхронизация с банком</h3>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="tariffs-section">
+        <div class="tariffs-container">
+            <h2 class="hero-title-24px">Тарифы</h2>
+
+            <div class="tariffs-cards">
+                <!-- Карточка Базового тарифа -->
+                <div class="tariff-card">
+                    <div class="title-card">
+                        <h3 class="tariff-name">Базовый</h3>
+                        <img src="/static/blog/images/logo.svg" alt="logo">
+                    </div>
+                    <ul class="tariff-features">
+                        <li>учет финансов</li>
+                        <li>отчетность</li>
+                        <li>напоминания</li>
+                    </ul>
+                    <div class="tariff-price">
+                        <span class="price">500</span>
+                        <span class="currency">₽/м.</span>
+                    </div>
+                    <a href="#" class="btn">Выбрать тариф</a>
+                </div>
+
+                <!-- Карточка Профессионального тарифа -->
+                <div class="tariff-card professional">
+                    <div class="title-card">
+                        <h3 class="tariff-name">Профессиональный</h3>
+                        <img src="/static/blog/images/logo.svg" alt="logo">
+                    </div>
+
+                    <ul class="tariff-features">
+                        <li>расширенная аналитика</li>
+                        <li>CRM</li>
+                        <li>интеграции</li>
+                    </ul>
+                    <div class="tariff-price">
+                        <span class="price">1500</span>
+                        <span class="currency">₽/м.</span>
+                    </div>
+                    <a href="#" class="btn">Выбрать тариф</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mobile-section">
+        <div class="mobile-container">
+            <div class="mobile-image">
+                <img src="/static/blog/images/land_phone.svg" alt="phone">
+            </div>
+            <div class="mobile-content">
+                <h1 class="mobile-title">
+                    Скачивайте<br>
+                    приложение
+                </h1>
+                <p>
+                    Полный контроль над вашими средствами в реальном<br>времени. Создавайте категории, отслеживайте<br>
+                    расходы, планируйте бюджет и получайте детальную<br>аналитику в один клик. Наше приложение - это
+                    ваш<br>
+                    персональный финансовый помощник, который<br>всегда под рукой.
+                </p>
+                <div class="apps"><img src="/static/blog/images/app_store.svg" alt="app">
+                    <img src="/static/blog/images/google_play.svg" alt="google_play">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="podpiska">
+                <div class="logo-box-fotter"><img src="/static/blog/images/logo_grey.svg" alt="logo"></div>
+                <div class="input-rassilka">
+                    <input type="email" id="email" class="form-input" placeholder="Получайте актуальную информацию">
+                    <button>Подписаться</button>
+                </div>
+            </div>
+            <div class="footer-content">
+                <div class="nav-links">
+                    <h3>Информация:</h3>
+                    <p><a href="#">О сервисе</a></p>
+                    <p><a href="#">Тарифы</a></p>
+                    <p><a href="#">Справочная</a></p>
+                    <p><a href="#">Поддержка</a></p>
+                </div>
+                <div class="footer-contacts">
+                    <h3>Контакты</h3>
+                    <p>Телефон: +7 (499) 605-20-00</p>
+                    <p>Email: fin@gmail.com</p>
+                </div>
+                <div class="footer-social">
+                    <div class="apps"><img src="/static/blog/images/app_store.svg" alt="app">
+                        <img src="/static/blog/images/google_play.svg" alt="google_play">
+                    </div>
+                    <div class="social-links">
+                        <h3>Соцсети:</h3>
+                        <div class="social-icons">
+                            <div class="icon"><img src="/static/blog/images/rutube.svg" alt="rutube"></div>
+                            <div class="icon"><img src="/static/blog/images/tg.svg" alt="tg"></div>
+                            <div class="icon"><img src="/static/blog/images/vk_white.svg" alt="vk_white"></div>
+                            <div class="icon"><img src="/static/blog/images/yandex_zen.svg" alt="zen"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="prava">@ Все права защищены.</div>
+        </div>
+
+    </footer>
+</body>
+
+</html>

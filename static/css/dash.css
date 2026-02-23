@@ -1,0 +1,495 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'PT Sans', sans-serif;
+    background: #f8f9fa;
+    color: #333;
+    overflow-x: hidden;
+}
+
+.layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* ===== САЙДБАР (БОКОВОЕ МЕНЮ) ===== */
+.sidebar {
+    width: 280px;
+    background: #0066cc;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    overflow-y: auto;
+    z-index: 100;
+}
+
+.sidebar-header {
+    padding: 24px 24px 20px;
+}
+
+.logo {
+    display: flex;
+    justify-content: center;
+}
+
+.sidebar-nav {
+    padding: 20px 16px 30px;
+}
+
+/* Секции меню */
+.nav-section {
+    margin-bottom: 24px;
+}
+
+/* Пункты меню */
+.nav-menu {
+    list-style: none;
+}
+
+.submenu li {
+    margin-bottom: 2px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.nav-menu a {
+    display: block;
+    padding: 10px 16px;
+    color: #f0f0f0;
+    text-decoration: none;
+    font-size: 20px;
+    border-radius: 8px;
+}
+
+/* Пункты с подменю */
+.has-submenu>a {
+    position: relative;
+}
+
+.has-submenu>a::after {
+    content: '›';
+    position: absolute;
+    right: 16px;
+    transform: rotate(90deg);
+    font-size: 18px;
+    transition: transform 0.2s;
+}
+
+.has-submenu:hover>a::after {
+    transform: rotate(270deg);
+}
+
+/* Подменю */
+.submenu {
+    list-style: none;
+    padding-left: 40px;
+    margin-top: 4px;
+    margin-bottom: 4px;
+}
+
+.submenu a {
+    padding: 8px 16px;
+    font-size: 16px;
+    color: #ffffff;
+}
+
+/* ===== ОСНОВНОЙ КОНТЕНТ ===== */
+.main-content {
+    flex: 1;
+    margin-left: 280px;
+    padding: 30px;
+    background: #f8f9fa;
+    min-height: 100vh;
+}
+
+/* Шапка */
+.dashboard-header {
+    background-color: #0066cc;
+    margin-bottom: 30px;
+    padding: 20px 30px;
+    /* Добавил отступы */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+    /* Белый текст */
+    margin-left: -30px;
+    /* Растягиваем влево */
+    margin-right: -30px;
+    /* Растягиваем вправо */
+    margin-top: -30px;
+    /* Растягиваем вверх */
+}
+
+.dashboard-header h1 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 24px;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+.avatar {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid white;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.profile-info {
+    color: #ffffff;
+    text-align: left;
+}
+
+.greeting {
+    font-size: 14px;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.profile-name {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0;
+}
+
+/* Карточки */
+.operations-section,
+.chart-card,
+.analysis-section,
+.leaders-card,
+.reminders-card {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.operations-section:hover,
+.chart-card:hover,
+.analysis-section:hover,
+.leaders-card:hover,
+.reminders-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.operations-section {
+    margin-bottom: 30px;
+}
+
+.operations-section h2 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+/* Фильтры */
+.top {
+    display: flex;
+    justify-content: space-between;
+}
+
+.filters button {
+    height: 41.6px;
+    border-radius: 20px;
+    border-style: none;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.filters {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.filters input::placeholder {
+    font-size: 16px;
+}
+
+.filters select {
+    font-size: 16px;
+}
+
+.filter-input,
+.filter-select {
+    color: #666;
+    padding: 10px 16px;
+    border: 1px solid #e0e0e0;
+    border-radius: 20px;
+    font-family: 'PT Sans', sans-serif;
+    font-size: 16px;
+    background: white;
+}
+
+.filter-input {
+    width: 200px;
+}
+
+.filter-select {
+    width: 200px;
+}
+
+.filter-input:focus,
+.filter-select:focus {
+    outline: none;
+    border-color: #0066cc;
+}
+
+.btn-add button {
+    height: 41.6px;
+    background-color: #cc6666;
+    color: #ffffff;
+    border-radius: 20px;
+    border-style: none;
+    display: flex;
+    align-items: center;
+    gap: 50px;
+}
+
+.btn-add button h3 {
+    padding: 10px 20px;
+}
+
+.btn-add button img {
+    padding-right: 10px;
+}
+
+/* Таблица */
+.operations-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.operations-table th {
+    text-align: left;
+    padding: 12px 16px;
+    background: #f8f9fa;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: #666;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+.operations-table td {
+    padding: 16px;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 15px;
+}
+
+.category-icon {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin: 0 auto;
+}
+
+.category-icon.income {
+    background: #00b894;
+}
+
+.category-icon.expense {
+    background: #ff7675;
+}
+
+.category-icon.transfer {
+    background: #fdcb6e;
+}
+
+.amount {
+    font-weight: 600;
+}
+
+.amount.positive {
+    color: #00b894;
+}
+
+.amount.negative {
+    color: #ff7675;
+}
+
+/* Графики */
+.charts-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+.chart-card h3 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+.chart-period {
+    margin-bottom: 20px;
+    font-size: 14px;
+    color: #666;
+}
+
+.chart-period span {
+    color: #999;
+    margin-right: 5px;
+}
+
+.chart-stats p {
+    margin-bottom: 8px;
+    font-size: 15px;
+}
+
+.stat-label {
+    color: #999;
+    margin-right: 10px;
+}
+
+/* Анализ */
+.analysis-section {
+    margin-bottom: 30px;
+}
+
+.analysis-section h3 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+.analysis-section p {
+    line-height: 1.8;
+    color: #666;
+    font-size: 15px;
+}
+
+/* Нижний ряд */
+.bottom-row {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: 30px;
+}
+
+.leaders-list {
+    list-style: none;
+}
+
+.leaders-list li {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.leaders-list li:last-child {
+    border-bottom: none;
+}
+
+.percent {
+    font-weight: 600;
+    color: #0066cc;
+}
+
+.reminders-list {
+    list-style: none;
+}
+
+.reminders-list li {
+    padding: 12px 0;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.reminders-list li:last-child {
+    border-bottom: none;
+}
+
+.date {
+    font-weight: 600;
+    color: #0066cc;
+    margin-right: 8px;
+}
+
+/* ===== АДАПТИВНОСТЬ ===== */
+@media (max-width: 1200px) {
+    .charts-row {
+        grid-template-columns: 1fr;
+    }
+
+    .bottom-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s;
+    }
+
+    .sidebar.open {
+        transform: translateX(0);
+    }
+
+    .main-content {
+        margin-left: 0;
+        padding: 20px;
+    }
+
+    .filters {
+        flex-direction: column;
+    }
+
+    .filter-input {
+        width: 100%;
+    }
+
+    .operations-table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+}
+
+/* Скроллбар для sidebar */
+.sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 3px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+    background: #999;
+}

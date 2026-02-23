@@ -18,6 +18,12 @@ def reg_page(request):
 def login_page(request):
     return render(request, 'blog/login.html')
 
+def landing_page(request):
+    return render(request, 'blog/landing.html')
+
+def dashboard_page(request):
+    return render(request, 'blog/dashboard.html')
+
 
 def home(request):
     completed_percentage = Application.objects.aggregate(

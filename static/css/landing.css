@@ -1,0 +1,535 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #f5f5f5;
+    font-family: 'PT Sans', sans-serif;
+}
+
+/* Навбар */
+.navbar {
+    background-color: #0066cc;
+    padding: 15px 0;
+    box-shadow: 0 4px 20px rgba(0, 102, 204, 0.3);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo img {
+    height: 50px;
+    width: auto;
+}
+
+.nav-menu {
+    display: flex;
+    align-items: center;
+    gap: 200px;
+}
+
+.navbar .nav-links {
+    display: flex;
+    gap: 35px;
+}
+
+.navbar .nav-links a {
+    color: white;
+    text-decoration: none;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    position: relative;
+    padding: 5px 0;
+    transition: color 0.3s;
+}
+
+.navbar .nav-links a:hover {
+    color: #ffb8b8;
+    text-decoration: none;
+}
+
+.nav-buttons {
+    display: flex;
+    gap: 15px;
+}
+
+.btn:hover {
+    color: #cc6666;
+    background-color: #ffffff;
+    box-shadow: 0 0 0 2px #cc6666;
+}
+
+.btn {
+    padding: 10px 24px;
+    border-radius: 10px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s;
+    background: #cc6666;
+    color: white;
+}
+
+/* Хиро-блок */
+.hero-section {
+    background: white;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+    margin: 60px 200px 60px 200px;
+    border-radius: 20px;
+}
+
+.hero-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    padding: 100px 20px 100px 20px;
+}
+
+.hero-content {
+    flex: 1;
+}
+
+.hero-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 36px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.hero-text {
+    font-family: 'PT Sans', sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.hero-container .btn {
+    font-size: 14px;
+}
+
+.hero-image {
+    flex: 1;
+    text-align: center;
+}
+
+.hero-image img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+
+.power-section {
+    background: white;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+    margin: 60px 200px 60px 200px;
+    border-radius: 20px;
+}
+
+.power-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 60px 20px 60px 20px;
+}
+
+.hero-title-24px {
+    font-size: 24px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    color: #333;
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.cards {
+    display: flex;
+    align-items: center;
+    gap: 50px;
+}
+
+.cards .item,
+.cards .item-short {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+}
+
+.cards .item-short h3 {
+    position: relative;
+    top: 58px;
+}
+
+
+/* Тарифы */
+.tariffs-section {
+    background: white;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+    margin: 60px 200px 60px 200px;
+    border-radius: 20px;
+    padding: 60px 0;
+}
+
+.tariffs-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 30px;
+}
+
+.tariffs-cards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.tariff-card {
+    background: #0066cc2d;
+    border-radius: 20px;
+    padding: 40px 30px;
+    text-align: center;
+    border: 2px solid transparent;
+}
+
+.tariff-card.professional {
+    background: #cc66669b;
+    color: white;
+    border: none;
+}
+
+.tariff-name {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 25px;
+    color: #333;
+}
+
+.professional .tariff-name {
+    color: white;
+}
+
+.tariff-features {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 30px 0;
+    text-align: left;
+}
+
+.title-card {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-evenly;
+}
+
+.title-card img {
+    width: 10%;
+}
+
+.tariff-features li {
+    font-family: 'PT Sans', sans-serif;
+    font-size: 18px;
+    margin-left: 40px;
+    margin-right: 40px;
+    padding: 10px 0;
+    color: #666;
+    border-bottom: 1px solid #ffffffcf;
+    position: relative;
+    padding-left: 30px;
+}
+
+.tariff-features li::before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: #4a90e2;
+    font-weight: bold;
+}
+
+.professional .tariff-features li {
+    color: rgba(255, 255, 255, 0.9);
+    border-bottom-color: rgba(255, 255, 255, 0.2);
+}
+
+.professional .tariff-features li::before {
+    color: white;
+}
+
+.tariff-price {
+    margin-bottom: 30px;
+}
+
+.tariff-price .price {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: #333;
+}
+
+.tariff-price .currency {
+    font-family: 'PT Sans', sans-serif;
+    font-size: 18px;
+    color: #999;
+    margin-left: 5px;
+}
+
+.professional .tariff-price .price {
+    color: white;
+}
+
+.professional .tariff-price .currency {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* Кнопка */
+.tariff-btn {
+    display: inline-block;
+    padding: 15px 40px;
+    background: white;
+    color: #4a90e2;
+    text-decoration: none;
+    border-radius: 50px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+    transition: all 0.3s;
+    border: 2px solid #4a90e2;
+}
+
+.tariff-btn:hover {
+    background: #4a90e2;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(74, 144, 226, 0.3);
+}
+
+.professional .tariff-btn {
+    background: transparent;
+    color: white;
+    border-color: white;
+}
+
+.professional .tariff-btn:hover {
+    background: white;
+    color: #764ba2;
+    border-color: white;
+}
+
+/* Реклама приложения */
+.mobile-section {
+    background: white;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+    margin: 60px 200px 60px 200px;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.mobile-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding-top: 50px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 50px;
+}
+
+.mobile-container h1 {
+    font-size: 36px;
+}
+
+.mobile-content p {
+    line-height: 1.4;
+}
+
+.mobile-image {
+    padding-top: 30px;
+    display: flex;
+    align-items: flex-end;
+    margin-bottom: -4px;
+}
+
+.mobile-content {
+    display: flex;
+    flex-direction: column;
+    gap: 60px;
+
+}
+
+/* Футер */
+.footer {
+    background-color: #f8f9fa;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 60px 30px 30px 30px;
+}
+
+.footer-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 40px;
+    padding: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.footer-content .nav-links a{
+    text-decoration: none;
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.footer p {
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.footer h3 {
+    color: #333;
+    font-size: 16px;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+.footer .podpiska {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.footer .input-rassilka {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+
+}
+
+.footer .input-rassilka input {
+    width: 380px;
+    height: 40px;
+    border-radius: 12px;
+    background-color: #D9D9D9;
+    border: none;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+    font-size: 14px;
+    padding-left: 20px;
+}
+
+.footer .input-rassilka input::placeholder {
+    color: #697077;
+}
+
+.footer .input-rassilka button {
+    color: #000000;
+    background-color: #cc6666;
+    border-radius: 12px;
+    height: 40px;
+    width: 140px;
+    border: none;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.3s;
+}
+
+.footer .apps {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
+    padding-bottom: 10px;
+}
+
+.footer .apps img {
+    width: 40%;
+}
+
+.footer .social-icons {
+    display: flex;
+    align-items: center;
+}
+
+.footer .social-icons img {
+    filter: invert(60%) sepia(90%) saturate(2200%) hue-rotate(190deg) brightness(90%) contrast(90%);
+    width: 60%;
+}
+
+.footer .social-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    transition: background-color 0.3s;
+}
+
+.footer .prava {
+    padding: 30px;
+    font-size: 14px;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+
+    .navigation {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .nav-links {
+        justify-content: center;
+    }
+
+    .footer-content {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+
+    .footer-left {
+        align-items: center;
+        text-align: center;
+    }
+
+    .social-icons {
+        justify-content: center;
+    }
+}
