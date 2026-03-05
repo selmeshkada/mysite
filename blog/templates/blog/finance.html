@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Личный кабинет | ФИН</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=PT+Sans:wght@400;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/finance.css">
+</head>
+
+<body>
+    <div class="layout">
+        <!-- Боковое меню (sidebar) -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <img src="/static/blog/images/logo_FIN_white.svg" alt="ФИН">
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <!-- Главная панель -->
+                <div class="nav-section">
+                    <ul class="nav-menu">
+                        <a href="#">Главная панель</a>
+                        <ul class="submenu">
+                            <li><img src="/static/blog/images/folder.svg" alt="folder"><a href="#">Сводка</a></li>
+                        </ul>
+                        <li class="has-submenu">
+                            <a href="#">Финансы</a>
+                            <ul class="submenu">
+                                <li><img src="/static/blog/images/folder.svg" alt="folder"><a href="#">Доходы</a></li>
+                                <li><img src="/static/blog/images/folder.svg" alt="folder"><a href="#">Расходы</a></li>
+                                <li><img src="/static/blog/images/folder.svg" alt="folder"><a href="#">Категории</a>
+                                </li>
+                                <li><img src="/static/blog/images/folder.svg" alt="folder"><a href="#">Все операции</a>
+                                </li>
+                                <li><img src="/static/blog/images/folder.svg" alt="folder"><a href="#">Аналитика</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="has-submenu">
+                            <a href="#">Отчетность</a>
+                            <ul class="submenu">
+                                <li><img src="/static/blog/images/folder.svg" alt="folder"><a href="#">Налоги и
+                                        взносы</a></li>
+                                <li><img src="/static/blog/images/folder.svg" alt="folder"><a href="#">Готовые
+                                        отчеты</a></li>
+                                <li><img src="/static/blog/images/Chat_plus_light.svg" alt="chat"><a href="#">Новый
+                                        отчёт</a></li>
+                            </ul>
+                        </li>
+                        <li class="has-submenu">
+                            <a href="#">Планирование</a>
+                            <ul class="submenu">
+                                <li><img src="/static/blog/images/Bell_pin_light.svg" alt="pin"><a
+                                        href="#">Напоминания</a></li>
+                            </ul>
+                        </li>
+                        <li class="has-submenu">
+                            <a href="#">Справочная</a>
+                            <ul class="submenu">
+                                <li><img src="/static/blog/images/Chat_search_light.svg" alt="search"><a href="#">Статьи
+                                        и инструкции</a></li>
+                                <li><img src="/static/blog/images/faq.svg" alt="faq"><a href="#">FAQ</a></li>
+                                <li><img src="/static/blog/images/texting.svg" alt="text"><a href="#">Поддержка</a></li>
+                            </ul>
+                        </li>
+                        <li class="has-submenu">
+                            <a href="#">Тарифы</a>
+                            <ul class="submenu">
+                                <li><img src="/static/blog/images/star.svg" alt="star"><a href="#">Мой тариф</a>
+                                </li>
+                                <li><img src="/static/blog/images/Arrow.svg" alt="Arrow"><a href="#">Продлить
+                                        подписку</a></li>
+                                <li><img src="/static/blog/images/folder.svg" alt="folder"><a href="#">История
+                                        платежей</a></li>
+                            </ul>
+                        </li>
+                        <li class="has-submenu">
+                            <a href="#">Настройки</a>
+                            <ul class="submenu">
+                                <li><img src="/static/blog/images/User_cicrle.svg" alt="User_cicrle"><a href="#">Мой
+                                        профиль</a>
+                                </li>
+                                <li><img src="/static/blog/images/Sign_out_circle.svg" alt="Sign_out_circle"><a
+                                        href="#">Выйти</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+
+            </nav>
+        </aside>
+
+        <!-- Основной контент -->
+        <main class="main-content">
+            <!-- Шапка -->
+            <header class="dashboard-header">
+                <h1>Финансы</h1>
+                <div class="user-profile">
+                    <div class="profile-info">
+                        <h2 class="profile-name">Кириллова Ирина</h2>
+                    </div>
+                    <div class="avatar">
+                        <img src="/static/blog/images/ava.svg" alt="аватар">
+                    </div>
+                </div>
+            </header>
+
+            <!-- Все операции -->
+            <section class="operations-section">
+                <h2>Все операции</h2>
+                <div class="top">
+                    <div class="filters">
+                        <input type="text" placeholder="Фильтр по дате" class="filter-input">
+                        <select class="filter-select">
+                            <option>Категория</option>
+                        </select>
+                        <button><img src="/static/blog/images/Search_light.svg" alt="Search_light"></button>
+                    </div>
+                    <div class="btn-add">
+                        <button>
+                            <h3>Добавить</h3><img src="/static/blog/images/Add_light.svg" alt="add">
+                        </button>
+                    </div>
+                </div>
+
+                <table class="operations-table">
+                    <thead>
+                        <tr>
+                            <th>Дата</th>
+                            <th>Категория</th>
+                            <th>Контрагент</th>
+                            <th>Сумма</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>25.09.2025</td>
+                            <td>Доходы: Зарплата</td>
+                            <td>ООО "Вектор"</td>
+                            <td class="amount positive">+135 400 ₽</td>
+                        </tr>
+                        <tr>
+                            <td>30.09.2025</td>
+                            <td>Расходы: Продукты</td>
+                            <td>Супермаркет "БуссВилл"</td>
+                            <td class="amount negative">-5 248 ₽</td>
+                        </tr>
+                        <tr>
+                            <td>01.10.2025</td>
+                            <td>Расходы: Транспорт</td>
+                            <td>Яндекс.Такси</td>
+                            <td class="amount negative">-589 ₽</td>
+                        </tr>
+                        <tr>
+                            <td>02.10.2025</td>
+                            <td>Передача</td>
+                            <td>Иванова А.С.</td>
+                            <td class="amount negative">-15 000 ₽</td>
+                        </tr>
+                        <tr>
+                            <td>03.10.2025</td>
+                            <td>Доходы: Фриланс</td>
+                            <td>ООО "Альфа"</td>
+                            <td class="amount positive">+82 500 ₽</td>
+                        </tr>
+                        <tr>
+                            <td>04.10.2025</td>
+                            <td>Расходы: Развлечения</td>
+                            <td>Кинопрокат "Синема"</td>
+                            <td class="amount negative">-1 500 ₽</td>
+                        </tr>
+                        <tr>
+                            <td>06.10.2025</td>
+                            <td>Передача</td>
+                            <td>Кириллова Г.В.</td>
+                            <td class="amount positive">+15 375 ₽</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- Графики и аналитика -->
+            <div class="charts-row">
+                <div class="chart-card">
+                    <div class="zagolovok">
+                        <h3>График доходов/расходов</h3>
+                    </div>
+                    <div class="top-analys">
+                        <div class="left">
+
+                            <div class="chart-period">
+                                <span>Период:</span> Янв, фев, мар, апр, май, июн, авг, окт, ноя, дек
+                            </div>
+                            <div class="chart-stats">
+                                <p><span class="stat-label">Доходы:</span> 0 ₽</p>
+                                <p><span class="stat-label">Расходы:</span> 0 ₽</p>
+                            </div>
+                        </div>
+                        <div class="right">
+                            <h4>Анализ ежемесячной выручки</h4>
+                            <p>Сравнивая показатели с прошлым годом, можно <br>
+                                отметить стабильный рост в первом и втором
+                                <br>
+                                кварталах. Пик продаж пришелся на летние месяцы,<br> что полностью соответствует нашим
+                                прогнозам.
+                                <br> Текущие данные позволяют уверенно смотреть в <br>будущее.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="down-analys">
+                        <div class="left">
+                            <h4>Анализ ежемесячной выручки</h4>
+                            <p>Сравнивая показатели с прошлым годом, можно <br>
+                                отметить стабильный рост в первом и втором
+                                <br>
+                                кварталах. Пик продаж пришелся на летние месяцы,<br> что полностью соответствует нашим
+                                прогнозам.
+                                <br> Текущие данные позволяют уверенно смотреть в <br>будущее.
+                            </p>
+                        </div>
+                        <div class="right">
+                            <div class="chart-period">
+                                <span>Период:</span> Янв, фев, мар, апр, май, июн, авг, окт, ноя, дек
+                            </div>
+                            <div class="chart-stats">
+                                <p><span class="stat-label">Доходы:</span> 0 ₽</p>
+                                <p><span class="stat-label">Расходы:</span> 0 ₽</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Нижний ряд -->
+            <div class="bottom-row">
+                <section class="analysis-section">
+                    <h3>Анализ финансовой динамики</h3>
+                    <p>Основными факторами роста являются инфляция и инфляция накопления. Инфляция накоплений в 2023
+                        году
+                        составила 8%, что составляет 2% от общего объема денежных средств. Наблюдается рост инфляции,
+                        что
+                        может привести к снижению покупательной способности населения. Инфляция накоплений в 2024 году
+                        составила 7%, что составляет 1% от общего объема денежных средств. Инфляция накоплений в 2025
+                        году
+                        может достигать 9%, что будет вызвать рост цен на основные товары.</p>
+                </section>
+            </div>
+        </main>
+    </div>
+</body>
+
+</html>

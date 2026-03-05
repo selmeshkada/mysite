@@ -14,7 +14,6 @@ from django.urls import reverse_lazy, reverse
 def reg_page(request):
     return render(request, 'blog/reg.html')
 
-
 def login_page(request):
     return render(request, 'blog/login.html')
 
@@ -24,6 +23,11 @@ def landing_page(request):
 def dashboard_page(request):
     return render(request, 'blog/dashboard.html')
 
+def finance_page(request):
+    return render(request, 'blog/finance.html')
+
+def reports_page(request):
+    return render(request, 'blog/reports.html')
 
 def home(request):
     completed_percentage = Application.objects.aggregate(
