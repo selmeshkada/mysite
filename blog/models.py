@@ -1,192 +1,435 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from django.core.validators import MinLengthValidator, RegexValidator
-from django.db.models.signals import post_save
-from django.dispatch import receiver
+from django.core.validators import MinValueValidator, MaxValueValidator
+from django.utils import timezone
+
+
+from django.db import models
+from django.contrib.auth.models import AbstractUser, BaseUserManager
+from django.core.validators import MinValueValidator, MaxValueValidator
+from django.utils import timezone
+
+
+class UserManager(BaseUserManager):
+    """Менеджер для кастомной модели пользователя"""
+    
+    def create_user(self, email, full_name, password=None, **extra_fields):
+        """Создание обычного пользователя"""
+        if not email:
+            raise ValueError('Email должен быть указан')
+        if not full_name:
+            raise ValueError('Полное имя должно быть указано')
+        
+        email = self.normalize_email(email)
+        user = self.model(
+            email=email,
+            full_name=full_name,
+            **extra_fields
+        )
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+    
+    def create_superuser(self, email, full_name, password=None, **extra_fields):
+        """Создание суперпользователя"""
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+        extra_fields.setdefault('is_active', True)
+        
+        return self.create_user(email, full_name, password, **extra_fields)
+
 
 class User(AbstractUser):
-    ROLE_CHOICES = [
-        ('Организация', 'Организация'),
-        ('Аудитор', 'Аудитор'),
-        ('Администратор', 'Администратор'),
-    ]
+    """
+    Модель пользователя (соответствует таблице users)
+    """
+    username = None  # Отключаем поле username
+    first_name = None  # Отключаем стандартное first_name
+    last_name = None  # Отключаем стандартное last_name
     
-    username = models.CharField(max_length=255, unique=True, verbose_name="Логин")
-    password = models.CharField(max_length=128, verbose_name="Пароль")
-    email = models.EmailField(unique=True, verbose_name="Email")
-    phone_number = models.CharField(
-        max_length=11,
+    email = models.EmailField(
         unique=True,
-        validators=[MinLengthValidator(11), RegexValidator(r'^[0-9]*$')],
+        verbose_name="Электронная почта"
+    )
+    full_name = models.CharField(
+        max_length=255,
+        verbose_name="Полное имя"
+    )
+    phone = models.CharField(
+        max_length=20,
+        blank=True,
+        null=True,
         verbose_name="Телефон"
     )
-    role = models.CharField(max_length=15, choices=ROLE_CHOICES, verbose_name="Роль")
+    is_active = models.BooleanField(
+        default=True,
+        verbose_name="Активен"
+    )
+    created_at = models.DateTimeField(
+        default=timezone.now,
+        verbose_name="Дата создания"
+    )
     
-    first_name = None
-    last_name = None
+    # Указываем менеджер
+    objects = UserManager()
     
+    # Указываем поле для логина
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['full_name']
+
     class Meta:
+        db_table = 'users'
         verbose_name = "Пользователь"
         verbose_name_plural = "Пользователи"
-    
-    def __str__(self):
-        return f"{self.username} ({self.role})"
 
-class Organization(models.Model):
-    user = models.OneToOneField('User', on_delete=models.CASCADE, verbose_name="Пользователь")
-    name = models.CharField(max_length=255, verbose_name="Название")
-    address = models.TextField(verbose_name="Адрес", blank=True, null=True)
+    def __str__(self):
+        return self.email
+
+
+class SubscriptionPlan(models.Model):
+    """
+    Модель тарифных планов (subscription_plans)
+    """
+    name = models.CharField(
+        max_length=100,
+        verbose_name="Название тарифа"
+    )
+    price_monthly = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        verbose_name="Цена в месяц"
+    )
+    price_yearly = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        verbose_name="Цена в год"
+    )
+    description = models.TextField(
+        blank=True,
+        verbose_name="Описание"
+    )
+    features = models.TextField(
+        blank=True,
+        help_text="Возможности тарифа, разделенные запятыми",
+        verbose_name="Возможности"
+    )
+    is_active = models.BooleanField(
+        default=True,
+        verbose_name="Активен"
+    )
+    created_at = models.DateTimeField(
+        default=timezone.now,
+        verbose_name="Дата создания"
+    )
+
+    class Meta:
+        db_table = 'subscription_plans'
+        verbose_name = "Тарифный план"
+        verbose_name_plural = "Тарифные планы"
+
+    def __str__(self):
+        return self.name
+
+    def get_features_list(self):
+        """Возвращает список возможностей"""
+        return [f.strip() for f in self.features.split(',') if f.strip()]
+
+
+class Subscription(models.Model):
+    """
+    Модель подписок пользователей (subscriptions)
+    """
+    STATUS_CHOICES = [
+        ('active', 'Активна'),
+        ('expired', 'Истекла'),
+        ('cancelled', 'Отменена'),
+        ('trial', 'Пробный период'),
+    ]
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='subscriptions',
+        verbose_name="Пользователь"
+    )
+    plan = models.ForeignKey(
+        SubscriptionPlan,
+        on_delete=models.CASCADE,
+        related_name='subscriptions',
+        verbose_name="Тариф"
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='trial',
+        verbose_name="Статус"
+    )
+    start_date = models.DateField(
+        verbose_name="Дата начала"
+    )
+    end_date = models.DateField(
+        verbose_name="Дата окончания"
+    )
+    created_at = models.DateTimeField(
+        default=timezone.now,
+        verbose_name="Дата создания"
+    )
+
+    class Meta:
+        db_table = 'subscriptions'
+        verbose_name = "Подписка"
+        verbose_name_plural = "Подписки"
+
+    def __str__(self):
+        return f"{self.user.email} - {self.plan.name}"
+
+
+class Company(models.Model):
+    """
+    Модель компании (companies)
+    """
+    TAX_SYSTEM_CHOICES = [
+        ('osn', 'ОСН'),
+        ('usn_income', 'УСН (Доходы)'),
+        ('usn_income_expense', 'УСН (Доходы минус расходы)'),
+        ('eshn', 'ЕСХН'),
+        ('patent', 'Патент'),
+        ('npd', 'НПД'),
+    ]
+
+    creator = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='companies',
+        verbose_name="Создатель"
+    )
+    name = models.CharField(
+        max_length=255,
+        verbose_name="Название компании"
+    )
     inn = models.CharField(
         max_length=12,
-        validators=[RegexValidator(r'^[0-9]*$')],
-        verbose_name="ИНН",
-        blank=True,
-        null=True
+        verbose_name="ИНН"
     )
-    filials = models.BooleanField(default=False, verbose_name="Есть филиалы")
-    legal_cases = models.BooleanField(default=False, verbose_name="Судебные дела")
-    tax_audits = models.BooleanField(default=False, verbose_name="Налоговые проверки")
-    last_audit_date = models.DateField(verbose_name="Дата последнего аудита", blank=True, null=True)
-    
-    class Meta:
-        verbose_name = "Организация"
-        verbose_name_plural = "Организации"
-    
-    def __str__(self):
-        return self.name
+    ogrn = models.CharField(
+        max_length=15,
+        blank=True,
+        null=True,
+        verbose_name="ОГРН"
+    )
+    legal_address = models.TextField(
+        verbose_name="Юридический адрес"
+    )
+    tax_system = models.CharField(
+        max_length=50,
+        choices=TAX_SYSTEM_CHOICES,
+        verbose_name="Система налогообложения"
+    )
+    created_at = models.DateTimeField(
+        default=timezone.now,
+        verbose_name="Дата создания"
+    )
 
-class AuditorCompany(models.Model):
-    user = models.OneToOneField('User', on_delete=models.CASCADE, verbose_name="Пользователь")
-    name = models.CharField(max_length=255, verbose_name="Название")
-    address = models.TextField(verbose_name="Адрес")
-    postal_address = models.TextField(verbose_name="Почтовый адрес", blank=True, null=True)
-    ogrn = models.CharField(max_length=13, verbose_name="ОГРН")
-    quality_control = models.BooleanField(default=True, verbose_name="Контроль качества")
-    certificate_number = models.CharField(max_length=50, verbose_name="Номер сертификата")
-    au_fio = models.CharField(max_length=255, verbose_name="ФИО аудитора")
     class Meta:
-        verbose_name = "Аудиторская компания"
-        verbose_name_plural = "Аудиторские компании"
-    
-    def __str__(self):
-        return self.name
+        db_table = 'companies'
+        verbose_name = "Компания"
+        verbose_name_plural = "Компании"
 
-class Application(models.Model):
+    def __str__(self):
+        return f"{self.name} (ИНН: {self.inn})"
+
+
+class Category(models.Model):
+    """
+    Модель категорий (categories)
+    """
+    CATEGORY_TYPE_CHOICES = [
+        ('income', 'Доход'),
+        ('expense', 'Расход'),
+    ]
+
+    name = models.CharField(
+        max_length=100,
+        verbose_name="Название категории"
+    )
+    type = models.CharField(
+        max_length=10,
+        choices=CATEGORY_TYPE_CHOICES,
+        verbose_name="Тип категории"
+    )
+    icon = models.CharField(
+        max_length=50,
+        blank=True,
+        null=True,
+        verbose_name="Иконка"
+    )
+
+    class Meta:
+        db_table = 'categories'
+        verbose_name = "Категория"
+        verbose_name_plural = "Категории"
+
+    def __str__(self):
+        return f"{self.get_type_display()}: {self.name}"
+
+
+class Transaction(models.Model):
+    """
+    Модель транзакций (transactions)
+    """
+    OPERATION_TYPE_CHOICES = [
+        ('income', 'Доход'),
+        ('expense', 'Расход'),
+    ]
+
+    company = models.ForeignKey(
+        Company,
+        on_delete=models.CASCADE,
+        related_name='transactions',
+        verbose_name="Компания"
+    )
+    category = models.ForeignKey(
+        Category,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='transactions',
+        verbose_name="Категория"
+    )
+    amount = models.DecimalField(
+        max_digits=15,
+        decimal_places=2,
+        validators=[MinValueValidator(0.01)],
+        verbose_name="Сумма"
+    )
+    operation_type = models.CharField(
+        max_length=10,
+        choices=OPERATION_TYPE_CHOICES,
+        verbose_name="Тип операции"
+    )
+    description = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name="Описание"
+    )
+    counterparty = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        verbose_name="Контрагент"
+    )
+    transaction_date = models.DateField(
+        verbose_name="Дата операции"
+    )
+    created_at = models.DateTimeField(
+        default=timezone.now,
+        verbose_name="Дата создания"
+    )
+
+    class Meta:
+        db_table = 'transactions'
+        verbose_name = "Транзакция"
+        verbose_name_plural = "Транзакции"
+        ordering = ['-transaction_date', '-created_at']
+
+    def __str__(self):
+        return f"{self.transaction_date} | {self.company.name} | {self.amount} ₽"
+
+
+class Report(models.Model):
+    """
+    Модель отчетов (reports)
+    """
     STATUS_CHOICES = [
-        ('На рассмотрении', 'На рассмотрении'),
-        ('Принято', 'Принято'),
-        ('Отклонено', 'Отклонено'),
-        ('Завершено', 'Завершено'),
+        ('draft', 'Черновик'),
+        ('generating', 'Генерируется'),
+        ('ready', 'Готов'),
+        ('error', 'Ошибка'),
     ]
-    
-    organization = models.ForeignKey('Organization', on_delete=models.CASCADE, verbose_name="Организация")
-    auditor_company = models.ForeignKey('AuditorCompany', on_delete=models.CASCADE, related_name='applications', null=True, blank=True)
-    status = models.CharField(max_length=15, choices=STATUS_CHOICES, default='На рассмотрении', verbose_name="Статус")
-    file = models.FileField(upload_to='applications/', verbose_name="Файл", blank=True, null=True)
-    date = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
-    audit_start = models.DateField(verbose_name="Дата начала аудита", blank=True, null=True)
-    audit_end = models.DateField(verbose_name="Дата окончания аудита", blank=True, null=True)
-    comments = models.TextField(verbose_name="Комментарии", blank=True, null=True)
-    analysis_result = models.TextField(verbose_name="Результат анализа", blank=True, null=True)
-    
-    class Meta:
-        verbose_name = "Заявка"
-        verbose_name_plural = "Заявки"
-        ordering = ['-date']
-    
-    def __str__(self):
-        return f"Заявка #{self.id} от {self.organization}"
-    
-    def get_status_color(self):
-        if self.status == 'Завершено':
-            return 'green'
-        elif self.status == 'Отклонено':
-            return 'red'
-        elif self.status == 'Принято':
-            return 'blue'
-        return 'gray'
-    get_status_color.short_description = "Цвет статуса"
 
-class Document(models.Model):
-    FILE_TYPES = [
-        ('pdf', 'PDF'),
-        ('xlsx', 'Excel'),
-        ('csv', 'CSV'),
+    REPORT_TYPE_CHOICES = [
+        ('profit_loss', 'Прибыли и убытки'),
+        ('balance', 'Баланс'),
+        ('tax', 'Налоговый отчет'),
+        ('custom', 'Пользовательский'),
     ]
-    
-    application = models.ForeignKey('Application', on_delete=models.CASCADE, verbose_name="Заявка")
-    name = models.CharField(max_length=300, verbose_name="Название")
-    type = models.CharField(max_length=10, choices=FILE_TYPES, verbose_name="Тип файла")
-    uploaded_by = models.ForeignKey('User', on_delete=models.CASCADE, verbose_name="Загрузил")
-    upload_date = models.DateTimeField(auto_now_add=True, verbose_name="Дата загрузки")
-    file = models.FileField(upload_to='documents/', verbose_name="Файл")
-    
+
+    company = models.ForeignKey(
+        Company,
+        on_delete=models.CASCADE,
+        related_name='reports',
+        verbose_name="Компания"
+    )
+    report_type = models.CharField(
+        max_length=50,
+        choices=REPORT_TYPE_CHOICES,
+        verbose_name="Тип отчета"
+    )
+    period_month = models.IntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(12)],
+        verbose_name="Месяц"
+    )
+    period_year = models.IntegerField(
+        verbose_name="Год"
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='draft',
+        verbose_name="Статус"
+    )
+    file_path = models.CharField(
+        max_length=500,
+        blank=True,
+        null=True,
+        verbose_name="Путь к файлу"
+    )
+    created_at = models.DateTimeField(
+        default=timezone.now,
+        verbose_name="Дата создания"
+    )
+
     class Meta:
-        verbose_name = "Документ"
-        verbose_name_plural = "Документы"
-        ordering = ['-upload_date']
-    
+        db_table = 'reports'
+        verbose_name = "Отчет"
+        verbose_name_plural = "Отчеты"
+        ordering = ['-period_year', '-period_month']
+
     def __str__(self):
-        return self.name
+        return f"{self.company.name} - {self.get_report_type_display()} {self.period_month}.{self.period_year}"
+
 
 class Notification(models.Model):
-    user_to = models.ForeignKey('User', on_delete=models.CASCADE, related_name='notifications', verbose_name="Получатель")
-    message = models.TextField(verbose_name="Сообщение")
-    is_read = models.BooleanField(default=False, verbose_name="Прочитано")
-    sent_date = models.DateTimeField(auto_now_add=True, verbose_name="Дата отправки")
-    
+    """
+    Модель уведомлений (notifications)
+    """
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='notifications',
+        verbose_name="Пользователь"
+    )
+    title = models.CharField(
+        max_length=255,
+        verbose_name="Заголовок"
+    )
+    content = models.TextField(
+        verbose_name="Содержание"
+    )
+    notification_date = models.DateTimeField(
+        default=timezone.now,
+        verbose_name="Дата уведомления"
+    )
+    is_read = models.BooleanField(
+        default=False,
+        verbose_name="Прочитано"
+    )
+
     class Meta:
+        db_table = 'notifications'
         verbose_name = "Уведомление"
         verbose_name_plural = "Уведомления"
-        ordering = ['-sent_date']
-    
-    def __str__(self):
-        return f"Уведомление для {self.user_to}"
+        ordering = ['-notification_date']
 
-class AuditLog(models.Model):
-    ACTION_CHOICES = [
-        ('INSERT', 'Добавление'),
-        ('UPDATE', 'Изменение'),
-        ('DELETE', 'Удаление'),
-    ]
-    
-    user = models.ForeignKey('User', on_delete=models.SET_NULL, null=True, verbose_name="Пользователь")
-    action_time = models.DateTimeField(auto_now_add=True, verbose_name="Время действия")
-    table_name = models.CharField(max_length=50, verbose_name="Таблица")
-    record_id = models.IntegerField(verbose_name="ID записи")
-    action_type = models.CharField(max_length=10, choices=ACTION_CHOICES, verbose_name="Тип действия")
-    old_data = models.JSONField(verbose_name="Старые данные", blank=True, null=True)
-    new_data = models.JSONField(verbose_name="Новые данные", blank=True, null=True)
-    ip_address = models.CharField(max_length=15, verbose_name="IP адрес", blank=True, null=True)
-    user_agent = models.TextField(verbose_name="User Agent", blank=True, null=True)
-    
-    class Meta:
-        verbose_name = "Лог аудита"
-        verbose_name_plural = "Логи аудита"
-        ordering = ['-action_time']
-    
     def __str__(self):
-        return f"{self.get_action_type_display()} в {self.table_name}"
+        return f"{self.user.email} - {self.title}"
     
-@receiver(post_save, sender=Application)
-def send_notification_on_status_change(sender, instance, **kwargs):
-    if kwargs.get('created', False):
-        # Уведомление при создании заявки
-        Notification.objects.create(
-            user_to=instance.auditor_company.user,
-            message=f'Новая заявка #{instance.id} от {instance.organization.name}'
-        )
-    else:
-        # Уведомление при изменении статуса
-        if instance.status == 'Завершено':
-            Notification.objects.create(
-                user_to=instance.organization.user,
-                message=f'Заявка #{instance.id} завершена'
-            )
-
-@receiver(post_save, sender=Application)
-def update_last_audit_date(sender, instance, **kwargs):
-    if instance.status == 'Завершено' and instance.audit_end:
-        Organization.objects.filter(id=instance.organization.id).update(
-            last_audit_date=instance.audit_end
-        )

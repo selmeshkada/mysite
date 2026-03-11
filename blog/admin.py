@@ -1,145 +1,170 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from django.utils.html import format_html
-from .models import User, Organization, AuditorCompany, Application, Document, Notification, AuditLog
+from .models import (
+    User, SubscriptionPlan, Subscription, Company,
+    Category, Transaction, Report, Notification
+)
 
+
+@admin.register(User)
 class CustomUserAdmin(UserAdmin):
-    list_display = ('username', 'email', 'phone_number', 'role', 'is_active')
-    list_display_links = ('username',)
-    list_filter = ('role', 'is_active')
-    search_fields = ('username', 'email', 'phone_number', 'role')
+    """Админка для пользователей"""
+    list_display = ('email', 'full_name', 'phone', 'is_active', 'created_at')
+    list_filter = ('is_active',)
+    search_fields = ('email', 'full_name', 'phone')
+    ordering = ('-created_at',)
+    
     fieldsets = (
-        (None, {'fields': ('username', 'password')}),
-        ('Персональная информация', {'fields': ('email', 'phone_number', 'role')}),
-        ('Права доступа', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
-        ('Важные даты', {'fields': ('last_login', 'date_joined')}),
-    )
-    add_fieldsets = (
-        (None, {
-            'classes': ('wide',),
-            'fields': ('username', 'email', 'phone_number', 'role', 'password1', 'password2'),
+        ('Основная информация', {
+            'fields': ('email', 'full_name', 'phone', 'password')
+        }),
+        ('Статус', {
+            'fields': ('is_active', 'is_staff', 'is_superuser')
+        }),
+        ('Даты', {
+            'fields': ('last_login', 'date_joined', 'created_at'),
+            'classes': ('collapse',)
         }),
     )
-    ordering = ('username',)
-    filter_horizontal = ('groups', 'user_permissions',)
-
-admin.site.register(User, CustomUserAdmin)
-
-class OrganizationAdmin(admin.ModelAdmin):
-    list_display = ('name', 'user', 'inn', 'last_audit_status')
-    list_display_links = ('name',)
-    list_filter = ('filials', 'legal_cases', 'tax_audits')
-    search_fields = ('name', 'inn', 'address')
-    raw_id_fields = ('user',)
     
-    @admin.display(description="Статус последнего аудита")
-    def last_audit_status(self, obj):
-        if obj.last_audit_date:
-            return f"Аудит проведен {obj.last_audit_date}"
-        return "Аудит не проводился"
+    readonly_fields = ('created_at', 'last_login', 'date_joined')
 
-    last_audit_status.short_description = "Статус последнего аудита"
 
-admin.site.register(Organization, OrganizationAdmin)
-
-class AuditorCompanyAdmin(admin.ModelAdmin):
-    list_display = ('name', 'user', 'ogrn', 'quality_control_status')
-    list_display_links = ('name',)
-    list_filter = ('quality_control',)
-    search_fields = ('name', 'ogrn', 'certificate_number', 'au_fio')
-    raw_id_fields = ('user',)
+@admin.register(SubscriptionPlan)
+class SubscriptionPlanAdmin(admin.ModelAdmin):
+    """Админка для тарифных планов"""
+    list_display = ('name', 'price_monthly', 'price_yearly', 'is_active', 'created_at')
+    list_filter = ('is_active',)
+    search_fields = ('name',)
+    ordering = ('price_monthly',)
     
-    @admin.display(description="Контроль качества", boolean=True)
-    def quality_control_status(self, obj):
-        return obj.quality_control
+    fieldsets = (
+        ('Основная информация', {
+            'fields': ('name', 'description', 'features')
+        }),
+        ('Цены', {
+            'fields': ('price_monthly', 'price_yearly')
+        }),
+        ('Статус', {
+            'fields': ('is_active',)
+        }),
+    )
 
-    quality_control_status.short_description = "Контроль качества"
 
-admin.site.register(AuditorCompany, AuditorCompanyAdmin)
-
-class DocumentInline(admin.TabularInline):
-    model = Document
-    extra = 0
-    readonly_fields = ('upload_date',)
-    fields = ('name', 'type', 'file', 'uploaded_by', 'upload_date')
-
-class ApplicationAdmin(admin.ModelAdmin):
-    list_display = ('id', 'organization', 'auditor_company', 'status_with_color', 'date', 'audit_duration')
-    list_display_links = ('id', 'organization')
-    list_filter = ('status', 'date', 'auditor_company')
-    search_fields = ('organization__name', 'auditor_company__name', 'comments')
-    raw_id_fields = ('organization', 'auditor_company')
-    date_hierarchy = 'date'
-    inlines = [DocumentInline]
-    readonly_fields = ('date',)
-    list_display_links = ('id', 'organization')
+@admin.register(Subscription)
+class SubscriptionAdmin(admin.ModelAdmin):
+    """Админка для подписок"""
+    list_display = ('user', 'plan', 'status', 'start_date', 'end_date', 'created_at')
+    list_filter = ('status', 'plan')
+    search_fields = ('user__email', 'user__full_name')
+    ordering = ('-created_at',)
     
-    @admin.display(description="Статус")
-    def status_with_color(self, obj):
-        color = obj.get_status_color()
-        return format_html(
-            '<span style="color: {}; font-weight: bold;">{}</span>',
-            color,
-            obj.get_status_display()
-        )
+    fieldsets = (
+        ('Пользователь и тариф', {
+            'fields': ('user', 'plan')
+        }),
+        ('Период', {
+            'fields': ('start_date', 'end_date')
+        }),
+        ('Статус', {
+            'fields': ('status',)
+        }),
+    )
+
+
+@admin.register(Company)
+class CompanyAdmin(admin.ModelAdmin):
+    """Админка для компаний"""
+    list_display = ('name', 'inn', 'creator', 'tax_system', 'created_at')
+    list_filter = ('tax_system',)
+    search_fields = ('name', 'inn', 'creator__email')
+    ordering = ('-created_at',)
     
-    status_with_color.short_description = "Статус заявки"
+    fieldsets = (
+        ('Основная информация', {
+            'fields': ('creator', 'name')
+        }),
+        ('Реквизиты', {
+            'fields': ('inn', 'ogrn', 'legal_address')
+        }),
+        ('Налогообложение', {
+            'fields': ('tax_system',)
+        }),
+    )
 
-    @admin.display(description="Длительность аудита")
-    def audit_duration(self, obj):
-        if obj.audit_start and obj.audit_end:
-            duration = (obj.audit_end - obj.audit_start).days
-            return f"{duration} дней"
-        return "Не указано"
+
+@admin.register(Category)
+class CategoryAdmin(admin.ModelAdmin):
+    """Админка для категорий"""
+    list_display = ('name', 'type', 'icon')
+    list_filter = ('type',)
+    search_fields = ('name',)
+    ordering = ('type', 'name')
+
+
+@admin.register(Transaction)
+class TransactionAdmin(admin.ModelAdmin):
+    """Админка для транзакций"""
+    list_display = ('transaction_date', 'company', 'operation_type', 'category', 'amount', 'counterparty')
+    list_filter = ('operation_type', 'category', 'transaction_date')
+    search_fields = ('description', 'counterparty', 'company__name')
+    ordering = ('-transaction_date', '-created_at')
     
-    audit_duration.short_description = "Длительность аудита"
-
-admin.site.register(Application, ApplicationAdmin)
-
-class DocumentAdmin(admin.ModelAdmin):
-    list_display = ('name', 'application_link', 'type', 'uploaded_by', 'upload_date')
-    list_display_links = ('name',)
-    list_filter = ('type', 'upload_date')
-    search_fields = ('name', 'application__id')
-    raw_id_fields = ('application', 'uploaded_by')
-    date_hierarchy = 'upload_date'
+    fieldsets = (
+        ('Компания и категория', {
+            'fields': ('company', 'category', 'operation_type')
+        }),
+        ('Детали операции', {
+            'fields': ('amount', 'counterparty', 'description')
+        }),
+        ('Даты', {
+            'fields': ('transaction_date', 'created_at'),
+            'classes': ('collapse',)
+        }),
+    )
     
-    @admin.display(description="Заявка")
-    def application_link(self, obj):
-        return format_html(
-            '<a href="/admin/yourapp/application/{}/change/">#{}</a>',
-            obj.application.id,
-            obj.application.id
-        )
+    readonly_fields = ('created_at',)
 
-    application_link.short_description = "Заявка"
 
-admin.site.register(Document, DocumentAdmin)
+@admin.register(Report)
+class ReportAdmin(admin.ModelAdmin):
+    """Админка для отчетов"""
+    list_display = ('company', 'report_type', 'period_month', 'period_year', 'status', 'created_at')
+    list_filter = ('status', 'report_type', 'period_year')
+    search_fields = ('company__name',)
+    ordering = ('-period_year', '-period_month')
+    
+    fieldsets = (
+        ('Компания и тип', {
+            'fields': ('company', 'report_type')
+        }),
+        ('Период', {
+            'fields': ('period_month', 'period_year')
+        }),
+        ('Статус и файл', {
+            'fields': ('status', 'file_path')
+        }),
+    )
 
+
+@admin.register(Notification)
 class NotificationAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user_to', 'short_message', 'is_read', 'sent_date')
-    list_display_links = ('id', 'short_message')
-    list_filter = ('is_read', 'sent_date')
-    search_fields = ('message', 'user_to__username')
-    raw_id_fields = ('user_to',)
-    date_hierarchy = 'sent_date'
-    readonly_fields = ('sent_date',)
+    """Админка для уведомлений"""
+    list_display = ('title', 'user', 'notification_date', 'is_read')
+    list_filter = ('is_read', 'notification_date')
+    search_fields = ('title', 'content', 'user__email')
+    ordering = ('-notification_date',)
     
-    @admin.display(description="Сообщение")
-    def short_message(self, obj):
-        return obj.message[:50] + '...' if len(obj.message) > 50 else obj.message
+    fieldsets = (
+        ('Получатель', {
+            'fields': ('user',)
+        }),
+        ('Содержание', {
+            'fields': ('title', 'content')
+        }),
+        ('Статус', {
+            'fields': ('is_read', 'notification_date')
+        }),
+    )
+
     
-    short_message.short_description = "Сообщение"
-
-admin.site.register(Notification, NotificationAdmin)
-
-class AuditLogAdmin(admin.ModelAdmin):
-    list_display = ('action_time', 'user', 'table_name', 'record_id', 'action_type')
-    list_display_links = ('action_time', 'table_name')
-    list_filter = ('action_type', 'table_name', 'action_time')
-    search_fields = ('user__username', 'table_name', 'record_id')
-    raw_id_fields = ('user',)
-    date_hierarchy = 'action_time'
-    readonly_fields = ('action_time', 'user', 'table_name', 'record_id', 'action_type', 'old_data', 'new_data')
-
-admin.site.register(AuditLog, AuditLogAdmin)
