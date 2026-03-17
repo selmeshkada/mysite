@@ -1,10 +1,57 @@
 from django import forms
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils import timezone
-from .models import (
-    User, SubscriptionPlan, Subscription, Company, 
-    Category, Transaction, Report, Notification
-)
+from .models import (User, SubscriptionPlan, Subscription, Company, Category, Transaction, Report, Notification)
+from .models import User
+from django.contrib.auth import authenticate
+
+class UserRegistrationForm(forms.ModelForm):
+    first_name = forms.CharField(
+        label='Имя',
+        widget=forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Имя'})
+    )
+    last_name = forms.CharField(
+        label='Фамилия',
+        widget=forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Фамилия'})
+    )
+    email = forms.EmailField(
+        label='Email',
+        widget=forms.EmailInput(attrs={'class': 'form-input', 'placeholder': 'email@example.com'})
+    )
+    password = forms.CharField(
+        label='Пароль',
+        widget=forms.PasswordInput(attrs={'class': 'form-input', 'placeholder': '••••••••'})
+    )
+    password2 = forms.CharField(
+        label='Повторите пароль',
+        widget=forms.PasswordInput(attrs={'class': 'form-input', 'placeholder': '••••••••'})
+    )
+
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'email']  # теперь поля first_name и last_name ОБЪЯВЛЕНЫ выше
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if User.objects.filter(email=email).exists():
+            raise forms.ValidationError('Пользователь с таким email уже существует')
+        return email
+
+    def clean(self):
+        cleaned_data = super().clean()
+        password = cleaned_data.get('password')
+        password2 = cleaned_data.get('password2')
+        if password and password2 and password != password2:
+            raise forms.ValidationError('Пароли не совпадают')
+        return cleaned_data
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.set_password(self.cleaned_data['password'])
+        user.username = self.cleaned_data['email']
+        if commit:
+            user.save()
+        return user
 
 
 class DateInput(forms.DateInput):
@@ -16,74 +63,6 @@ class DateTimeInput(forms.DateTimeInput):
     """Кастомный виджет для выбора даты и времени"""
     input_type = 'datetime-local'
 
-
-# ============== ФОРМЫ ДЛЯ ПОЛЬЗОВАТЕЛЕЙ ==============
-
-class UserRegistrationForm(forms.ModelForm):
-    """Форма регистрации пользователя"""
-    password = forms.CharField(
-        label='Пароль',
-        widget=forms.PasswordInput(attrs={
-            'class': 'form-input',
-            'placeholder': 'Введите пароль'
-        })
-    )
-    password_confirm = forms.CharField(
-        label='Подтверждение пароля',
-        widget=forms.PasswordInput(attrs={
-            'class': 'form-input',
-            'placeholder': 'Повторите пароль'
-        })
-    )
-
-    class Meta:
-        model = User
-        fields = ['email', 'full_name', 'phone']
-        widgets = {
-            'email': forms.EmailInput(attrs={
-                'class': 'form-input',
-                'placeholder': 'example@mail.ru'
-            }),
-            'full_name': forms.TextInput(attrs={
-                'class': 'form-input',
-                'placeholder': 'Иванов Иван Иванович'
-            }),
-            'phone': forms.TextInput(attrs={
-                'class': 'form-input',
-                'placeholder': '+7 (999) 123-45-67'
-            }),
-        }
-        labels = {
-            'email': 'Электронная почта',
-            'full_name': 'Полное имя',
-            'phone': 'Телефон',
-        }
-
-    def clean_email(self):
-        """Валидация уникальности email"""
-        email = self.cleaned_data.get('email')
-        if User.objects.filter(email=email).exists():
-            raise forms.ValidationError('Пользователь с таким email уже существует')
-        return email
-
-    def clean(self):
-        """Проверка совпадения паролей"""
-        cleaned_data = super().clean()
-        password = cleaned_data.get('password')
-        password_confirm = cleaned_data.get('password_confirm')
-
-        if password and password_confirm and password != password_confirm:
-            raise forms.ValidationError('Пароли не совпадают')
-
-        return cleaned_data
-
-    def save(self, commit=True):
-        """Сохранение пользователя с хешированием пароля"""
-        user = super().save(commit=False)
-        user.set_password(self.cleaned_data['password'])
-        if commit:
-            user.save()
-        return user
 
 
 class UserLoginForm(forms.Form):
@@ -107,39 +86,6 @@ class UserLoginForm(forms.Form):
         required=False,
         widget=forms.CheckboxInput(attrs={'class': 'form-checkbox'})
     )
-
-
-class UserProfileForm(forms.ModelForm):
-    """Форма редактирования профиля"""
-    class Meta:
-        model = User
-        fields = ['full_name', 'phone', 'email']
-        widgets = {
-            'full_name': forms.TextInput(attrs={
-                'class': 'form-input',
-                'placeholder': 'Иванов Иван Иванович'
-            }),
-            'phone': forms.TextInput(attrs={
-                'class': 'form-input',
-                'placeholder': '+7 (999) 123-45-67'
-            }),
-            'email': forms.EmailInput(attrs={
-                'class': 'form-input',
-                'placeholder': 'example@mail.ru'
-            }),
-        }
-        labels = {
-            'full_name': 'Полное имя',
-            'phone': 'Телефон',
-            'email': 'Email',
-        }
-
-    def clean_email(self):
-        """Валидация уникальности email"""
-        email = self.cleaned_data.get('email')
-        if User.objects.exclude(pk=self.instance.pk).filter(email=email).exists():
-            raise forms.ValidationError('Пользователь с таким email уже существует')
-        return email
 
 
 # ============== ФОРМЫ ДЛЯ ТАРИФОВ ==============

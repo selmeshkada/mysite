@@ -69,6 +69,13 @@ class User(AbstractUser):
         default=timezone.now,
         verbose_name="Дата создания"
     )
+
+    avatar = models.ImageField(
+        upload_to='avatars/',
+        blank=True,
+        null=True,
+        verbose_name="Аватар"
+    )
     
     # Указываем менеджер
     objects = UserManager()

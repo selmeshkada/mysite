@@ -85,16 +85,15 @@
                         <li class="has-submenu">
                             <a href="#">Настройки</a>
                             <ul class="submenu">
-                                <li><img src="/static/blog/images/User_cicrle.svg" alt="User_cicrle"><a href="#">Мой
-                                        профиль</a>
+                                <li><img src="/static/blog/images/User_cicrle.svg" alt="User_cicrle"> <a
+                                        href="{% url 'blog:profile' %}">Профиль</a>
                                 </li>
                                 <li><img src="/static/blog/images/Sign_out_circle.svg" alt="Sign_out_circle"><a
-                                        href="#">Выйти</a></li>
+                                        href="{% url 'blog:logout' %}">Выйти</a></li>
                             </ul>
                         </li>
                     </ul>
                 </div>
-
             </nav>
         </aside>
 
@@ -106,10 +105,22 @@
                 <div class="user-profile">
                     <div class="profile-info">
                         <span class="greeting">Добро пожаловать,</span>
-                        <h2 class="profile-name">Кириллова Ирина</h2>
+                        <h2 class="profile-name">{% if user.first_name or user.last_name %}
+                            {{ user.first_name }} {{ user.last_name }}
+                            {% else %}
+                            {{ user.email }}
+                            {% endif %}</h2>
                     </div>
                     <div class="avatar">
-                        <img src="/static/blog/images/ava.svg" alt="аватар">
+                        <a href="{% url 'blog:profile' %}">
+                            {% if user.avatar %}
+                            <img src="{{ user.avatar.url }}" alt="аватар"
+                                style="width:50px; height:50px; border-radius:50%; object-fit:cover;">
+                            {% else %}
+                            <img src="/static/blog/images/User_cicrle.svg" alt="аватар"
+                                style="width:50px; height:50px; border-radius:50%;">
+                            {% endif %}
+                        </a>
                     </div>
                 </div>
             </header>

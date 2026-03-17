@@ -6,21 +6,86 @@ from django.urls import reverse_lazy, reverse
 from django.db.models import Q, Sum, Count, Avg
 from django.db.models.functions import TruncMonth, TruncYear
 from django.contrib import messages
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.utils import timezone
 from datetime import timedelta
 from django.contrib.auth import authenticate, login, logout
+from django.contrib import messages
 
 from .models import (
     User, SubscriptionPlan, Subscription, Company,
     Category, Transaction, Report, Notification
 )
 from .forms import (
-    UserRegistrationForm, UserLoginForm, UserProfileForm,
+    UserRegistrationForm, UserLoginForm,
     SubscriptionPlanForm, SubscriptionForm, CompanyForm,
     CategoryForm, TransactionForm, ReportForm, ReportGenerateForm,
     TransactionFilterForm, ReportFilterForm, NotificationForm
 )
+
+def login_page(request):
+    if request.user.is_authenticated:
+        return redirect('blog:dashboard')
+    
+    if request.method == 'POST':
+        form = UserLoginForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            password = form.cleaned_data['password']
+            
+            # Найди пользователя по email
+            try:
+                user = User.objects.get(email=email)
+                # Аутентифицируй по username
+                user = authenticate(request, username=user.username, password=password)
+            except User.DoesNotExist:
+                user = None
+            
+            if user is not None:
+                login(request, user)
+                messages.success(request, f'С возвращением, {user.full_name}!')
+                return redirect('blog:dashboard')
+            else:
+                messages.error(request, 'Неверный email или пароль')
+    else:
+        form = UserLoginForm()
+    
+    return render(request, 'blog/login.html', {'form': form})
+
+def reg_page(request):
+    if request.user.is_authenticated:
+        return redirect('blog:dashboard')
+    
+    if request.method == 'POST':
+        form = UserRegistrationForm(request.POST)
+        if form.is_valid():
+            new_user = form.save(commit=False)
+            new_user.set_password(form.cleaned_data['password'])
+            new_user.save()
+            
+            # Автоматический вход после регистрации
+            user = authenticate(
+                username=form.cleaned_data['username'],
+                password=form.cleaned_data['password']
+            )
+            login(request, user)
+            
+            messages.success(request, 'Регистрация прошла успешно!')
+            return redirect('blog:dashboard')
+    else:
+        form = UserRegistrationForm()
+    
+    return render(request, 'blog/reg.html', {'form': form})
+
+def logout_view(request):
+    logout(request)
+    messages.info(request, 'Вы вышли из системы')
+    return redirect('blog:landing')
+
+@login_required
+def dashboard(request):
+    return render(request, 'blog/dashboard.html')
+
 
 
 # ============== СТРАНИЦЫ САЙТА (PUBLIC) ==============
@@ -72,7 +137,7 @@ def login_page(request):
                 if not form.cleaned_data.get('remember_me'):
                     request.session.set_expiry(0)
                 
-                messages.success(request, f'С возвращением, {user.full_name}!')
+                messages.success(request, 'С возвращением!')
                 return redirect('blog:dashboard')
             else:
                 messages.error(request, 'Неверный email или пароль')
@@ -694,16 +759,31 @@ def profile_view(request):
     return render(request, 'blog/profile.html', context)
 
 
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+
+@login_required
+def profile_view(request):
+    """Просмотр профиля"""
+    return render(request, 'blog/profile.html', {'user': request.user})
+
 @login_required
 def profile_edit(request):
     """Редактирование профиля"""
     if request.method == 'POST':
-        form = UserProfileForm(request.POST, request.FILES, instance=request.user)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Профиль успешно обновлен')
-            return redirect('blog:profile')
-    else:
-        form = UserProfileForm(instance=request.user)
+        user = request.user
+        user.first_name = request.POST.get('first_name')
+        user.last_name = request.POST.get('last_name')
+        user.email = request.POST.get('email')
+        
+        if 'avatar' in request.FILES:
+            user.avatar = request.FILES['avatar']
+        
+        user.save()
+        messages.success(request, 'Профиль обновлён')
+        return redirect('blog:profile')
     
-    return render(request, 'blog/profile_edit.html', {'form': form})
+    return render(request, 'blog/profile_edit.html', {'user': request.user})
+
+

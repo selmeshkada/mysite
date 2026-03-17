@@ -1,9 +1,10 @@
+<!DOCTYPE html>
 <html lang="ru">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Регистрация</title>
+    <title>Вход | ФИН</title>
     <link rel="stylesheet" href="/static/css/login.css?v=2">
 </head>
 
@@ -17,53 +18,58 @@
 
         <main class="main-content">
             <div class="registration-container">
-                <form class="registration-form">
-                    <h1 class="registration-title">Вход</h1>
-                    <div class="form-group">
-                        <label for="email">Email</label>
-                        <input type="email" id="email" class="form-input" placeholder="email@example.com">
-                    </div>
+                <!-- Добавили action и method -->
+                <form class="registration-form" method="post" action="{% url 'blog:login' %}">
+                    <form class="registration-form" method="post" action="{% url 'blog:login' %}">
+                        {% csrf_token %}
+                        <h1 class="registration-title">Вход</h1>
 
-                    <div class="form-group">
-                        <label for="password">Пароль</label>
-                        <input type="password" id="password" class="form-input" placeholder="••••••••">
-                    </div>
-
-                    <div class="remember">
-                        <div class="checkbox-group">
-                            <input type="checkbox" id="agreement">
-                            <label for="agreement">Запомнить меня</label>
+                        <!-- Поля email и password -->
+                        <div class="form-group">
+                            <label for="id_username">Email</label>
+                            <input type="text" name="username" id="id_username" class="form-input"
+                                placeholder="email@example.com" value="{{ form.username.value|default:'' }}">
                         </div>
-                        <div class="link-remember">
-                            <a href="#">Забыли пароль?</a>
+
+                        <div class="form-group">
+                            <label for="id_password">Пароль</label>
+                            <input type="password" name="password" id="id_password" class="form-input"
+                                placeholder="••••••••">
                         </div>
-                    </div>
 
-                    <button type="submit" class="register-btn">Продолжить</button>
+                        <!-- СТИЛИЗОВАННЫЙ Django-чекбокс -->
+                        <div class="remember">
+                            <div class="checkbox-group">
+                                {{ form.remember_me }} <!-- Это сам чекбокс -->
+                                <label for="{{ form.remember_me.id_for_label }}">Запомнить меня</label>
+                            </div>
+                        </div>
 
-                    <div class="divider">
-                        <span>Или войдите через:</span>
-                    </div>
+                        <button type="submit" class="register-btn">Продолжить</button>
 
-                    <div class="social-login">
-                        <button type="button" class="social-btn">
-                            <img src="/static/blog/images/google.svg" alt="Google" class="social-icon">
-                            Google
-                        </button>
-                        <button type="button" class="social-btn">
-                            <img src="/static/blog/images/gosuslugi.svg" alt="Email" class="social-icon">
-                            Госуслуги
-                        </button>
-                        <button type="button" class="social-btn">
-                            <img src="/static/blog/images/vk.svg" alt="VK" class="social-icon">
-                            ВК
-                        </button>
-                    </div>
+                        <!-- остальная часть формы -->
+                        <div class="divider"><span>Или войдите через:</span></div>
+                        <!-- ... соцсети и ссылки ... -->
 
-                    <div class="login-link">
-                        Нет аккаунта? <a href="{% url 'blog:reg' %}">Зарегистрируйтесь</a>
-                    </div>
-                </form>
+                        <div class="social-login">
+                            <button type="button" class="social-btn">
+                                <img src="/static/blog/images/google.svg" alt="Google" class="social-icon">
+                                Google
+                            </button>
+                            <button type="button" class="social-btn">
+                                <img src="/static/blog/images/gosuslugi.svg" alt="Email" class="social-icon">
+                                Госуслуги
+                            </button>
+                            <button type="button" class="social-btn">
+                                <img src="/static/blog/images/vk.svg" alt="VK" class="social-icon">
+                                ВК
+                            </button>
+                        </div>
+
+                        <div class="login-link">
+                            Нет аккаунта? <a href="{% url 'blog:reg' %}">Зарегистрируйтесь</a>
+                        </div>
+                    </form>
             </div>
         </main>
 

@@ -1,4 +1,5 @@
 from django.urls import path
+from django.contrib.auth import views as auth_views
 from . import views
 from .views import (
     # Аутентификация и страницы
@@ -41,13 +42,26 @@ urlpatterns = [
     path('', landing_page, name='landing'),
     path('reg/', reg_page, name='reg'),
     path('login/', login_page, name='login'),
-    path('logout/', logout_view, name='logout'),
+    path('logout/', views.logout_view, name='logout'),
+
+    path('password-reset/',
+         auth_views.PasswordResetView.as_view(),
+         name='password_reset'),
+    path('password-reset/done/',
+         auth_views.PasswordResetDoneView.as_view(),
+         name='password_reset_done'),
+    path('password-reset/<uidb64>/<token>/',
+         auth_views.PasswordResetConfirmView.as_view(),
+         name='password_reset_confirm'),
+    path('password-reset/complete/',
+         auth_views.PasswordResetCompleteView.as_view(),
+         name='password_reset_complete'),
     
     # ============== ЛИЧНЫЙ КАБИНЕТ ==============
     path('dashboard/', dashboard_page, name='dashboard'),
     path('finance/', finance_page, name='finance'),
     path('reports/', reports_page, name='reports'),
-    
+   
     # ============== API ==============
     path('api/dashboard-data/', dashboard_data, name='dashboard-data'),
     
@@ -90,7 +104,7 @@ urlpatterns = [
     path('notifications/read-all/', mark_all_notifications_read, name='notifications-read-all'),
     
     # ============== ПРОФИЛЬ ==============
-    path('profile/', profile_view, name='profile'),
-    path('profile/edit/', profile_edit, name='profile-edit'),
+    path('profile/', views.profile_view, name='profile'),
+    path('profile/edit/', views.profile_edit, name='profile-edit'),
 ]
 

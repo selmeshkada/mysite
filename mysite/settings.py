@@ -113,6 +113,7 @@ LOGIN_URL = 'blog:login'
 LOGIN_REDIRECT_URL = 'blog:dashboard'
 LOGOUT_REDIRECT_URL = 'blog:landing'
 
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
