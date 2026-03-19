@@ -427,6 +427,21 @@ body {
     padding-bottom: 30px;
 }
 
+
+/* Ошибка */
+.input-error {
+    border-color: #e74c3c;
+    background-color: #fff5f5;
+}
+
+/* Текст ошибки под полем */
+.error-text {
+    color: #e74c3c;
+    font-size: 13px;
+    margin-top: 5px;
+}
+
+
 /* Адаптивность */
 @media (max-width: 768px) {
     .header {

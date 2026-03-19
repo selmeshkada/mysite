@@ -11,6 +11,11 @@ from django.utils import timezone
 from datetime import timedelta
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django import forms
+from django.contrib.auth import authenticate
 
 from .models import (
     User, SubscriptionPlan, Subscription, Company,
@@ -23,33 +28,43 @@ from .forms import (
     TransactionFilterForm, ReportFilterForm, NotificationForm
 )
 
+from django.contrib.messages import get_messages
+
+from django import forms
+from django.contrib.auth import authenticate
+
+class UserLoginForm(forms.Form):
+    email = forms.EmailField()
+    password = forms.CharField(widget=forms.PasswordInput)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        email = cleaned_data.get('email')
+        password = cleaned_data.get('password')
+
+        if email and password:
+            user = authenticate(username=email, password=password)
+            if not user:
+                raise forms.ValidationError('Неверный email или пароль')
+
+            self.user = user
+
+        return cleaned_data
+    
+    
 def login_page(request):
     if request.user.is_authenticated:
         return redirect('blog:dashboard')
-    
+
     if request.method == 'POST':
         form = UserLoginForm(request.POST)
+
         if form.is_valid():
-            email = form.cleaned_data['email']
-            password = form.cleaned_data['password']
-            
-            # Найди пользователя по email
-            try:
-                user = User.objects.get(email=email)
-                # Аутентифицируй по username
-                user = authenticate(request, username=user.username, password=password)
-            except User.DoesNotExist:
-                user = None
-            
-            if user is not None:
-                login(request, user)
-                messages.success(request, f'С возвращением, {user.full_name}!')
-                return redirect('blog:dashboard')
-            else:
-                messages.error(request, 'Неверный email или пароль')
+            login(request, form.user)
+            return redirect('blog:dashboard')
     else:
         form = UserLoginForm()
-    
+
     return render(request, 'blog/login.html', {'form': form})
 
 def reg_page(request):
@@ -61,30 +76,23 @@ def reg_page(request):
         if form.is_valid():
             new_user = form.save(commit=False)
             new_user.set_password(form.cleaned_data['password'])
+
             new_user.save()
             
             # Автоматический вход после регистрации
             user = authenticate(
-                username=form.cleaned_data['username'],
+                request,
+                username=new_user.username,  # ← используем сохраненный username
                 password=form.cleaned_data['password']
             )
             login(request, user)
             
-            messages.success(request, 'Регистрация прошла успешно!')
+            messages.success(request, f'С возвращением, {new_user.first_name}!')
             return redirect('blog:dashboard')
     else:
         form = UserRegistrationForm()
     
     return render(request, 'blog/reg.html', {'form': form})
-
-def logout_view(request):
-    logout(request)
-    messages.info(request, 'Вы вышли из системы')
-    return redirect('blog:landing')
-
-@login_required
-def dashboard(request):
-    return render(request, 'blog/dashboard.html')
 
 
 
@@ -116,35 +124,6 @@ def reg_page(request):
         form = UserRegistrationForm()
     
     return render(request, 'blog/reg.html', {'form': form})
-
-
-def login_page(request):
-    """Страница входа"""
-    if request.user.is_authenticated:
-        return redirect('blog:dashboard')
-    
-    if request.method == 'POST':
-        form = UserLoginForm(request.POST)
-        if form.is_valid():
-            email = form.cleaned_data['email']
-            password = form.cleaned_data['password']
-            user = authenticate(request, username=email, password=password)
-            
-            if user is not None:
-                login(request, user)
-                
-                # Запоминаем пользователя если стоит галочка
-                if not form.cleaned_data.get('remember_me'):
-                    request.session.set_expiry(0)
-                
-                messages.success(request, 'С возвращением!')
-                return redirect('blog:dashboard')
-            else:
-                messages.error(request, 'Неверный email или пароль')
-    else:
-        form = UserLoginForm()
-    
-    return render(request, 'blog/login.html', {'form': form})
 
 
 def logout_view(request):
@@ -758,15 +737,6 @@ def profile_view(request):
     }
     return render(request, 'blog/profile.html', context)
 
-
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-
-@login_required
-def profile_view(request):
-    """Просмотр профиля"""
-    return render(request, 'blog/profile.html', {'user': request.user})
 
 @login_required
 def profile_edit(request):

@@ -6,49 +6,45 @@ from .models import User
 from django.contrib.auth import authenticate
 
 class UserRegistrationForm(forms.ModelForm):
-    first_name = forms.CharField(
-        label='Имя',
-        widget=forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Имя'})
+    full_name = forms.CharField(
+        label='Полное имя',
+        widget=forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Иван Иванов'})
     )
-    last_name = forms.CharField(
-        label='Фамилия',
-        widget=forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Фамилия'})
-    )
+
     email = forms.EmailField(
         label='Email',
-        widget=forms.EmailInput(attrs={'class': 'form-input', 'placeholder': 'email@example.com'})
+        widget=forms.EmailInput(attrs={'class': 'form-input'})
     )
+
     password = forms.CharField(
         label='Пароль',
-        widget=forms.PasswordInput(attrs={'class': 'form-input', 'placeholder': '••••••••'})
+        widget=forms.PasswordInput(attrs={'class': 'form-input'})
     )
+
     password2 = forms.CharField(
         label='Повторите пароль',
-        widget=forms.PasswordInput(attrs={'class': 'form-input', 'placeholder': '••••••••'})
+        widget=forms.PasswordInput(attrs={'class': 'form-input'})
     )
 
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'email']  # теперь поля first_name и last_name ОБЪЯВЛЕНЫ выше
+        fields = ['full_name', 'email']
 
     def clean_email(self):
         email = self.cleaned_data.get('email')
         if User.objects.filter(email=email).exists():
-            raise forms.ValidationError('Пользователь с таким email уже существует')
+            raise forms.ValidationError('Пользователь уже существует')
         return email
 
     def clean(self):
         cleaned_data = super().clean()
-        password = cleaned_data.get('password')
-        password2 = cleaned_data.get('password2')
-        if password and password2 and password != password2:
+        if cleaned_data.get('password') != cleaned_data.get('password2'):
             raise forms.ValidationError('Пароли не совпадают')
         return cleaned_data
 
     def save(self, commit=True):
         user = super().save(commit=False)
         user.set_password(self.cleaned_data['password'])
-        user.username = self.cleaned_data['email']
         if commit:
             user.save()
         return user

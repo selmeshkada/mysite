@@ -18,58 +18,72 @@
 
         <main class="main-content">
             <div class="registration-container">
-                <!-- Добавили action и method -->
+                <!-- action и method -->
                 <form class="registration-form" method="post" action="{% url 'blog:login' %}">
-                    <form class="registration-form" method="post" action="{% url 'blog:login' %}">
-                        {% csrf_token %}
-                        <h1 class="registration-title">Вход</h1>
-
-                        <!-- Поля email и password -->
-                        <div class="form-group">
-                            <label for="id_username">Email</label>
-                            <input type="text" name="username" id="id_username" class="form-input"
-                                placeholder="email@example.com" value="{{ form.username.value|default:'' }}">
+                    {% csrf_token %}
+                    <h1 class="registration-title">Вход</h1>
+                    <!-- Поля email и password -->
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" name="email" id="email" value="{{ form.email.value|default:'' }}"
+                            class="form-input {% if form.email.errors %}input-error{% endif %}" required>
+                        {% if form.email.errors %}
+                        <div class="error-text">
+                            {{ form.email.errors.0 }}
                         </div>
+                        {% endif %}
+                    </div>
 
-                        <div class="form-group">
-                            <label for="id_password">Пароль</label>
-                            <input type="password" name="password" id="id_password" class="form-input"
-                                placeholder="••••••••">
+                    <div class="form-group">
+                        <label for="password">Пароль</label>
+                        <input type="password" name="password" id="password"
+                            class="form-input {% if form.password.errors %}input-error{% endif %}" required>
+                        {% if form.password.errors %}
+                        <div class="error-text">
+                            {{ form.password.errors.0 }}
                         </div>
+                        {% endif %}
+                    </div>
 
-                        <!-- СТИЛИЗОВАННЫЙ Django-чекбокс -->
-                        <div class="remember">
-                            <div class="checkbox-group">
-                                {{ form.remember_me }} <!-- Это сам чекбокс -->
-                                <label for="{{ form.remember_me.id_for_label }}">Запомнить меня</label>
-                            </div>
+                    {% if form.non_field_errors %}
+                    <div class="form-error">
+                        {{ form.non_field_errors.0 }}
+                    </div>
+                    {% endif %}
+
+
+                    <div class="remember">
+                        <div class="checkbox-group">
+                            {{ form.remember_me }}
+                            <label for="{{ form.remember_me.id_for_label }}">Запомнить меня</label>
                         </div>
+                    </div>
 
-                        <button type="submit" class="register-btn">Продолжить</button>
+                    <button type="submit" class="register-btn">Продолжить</button>
 
-                        <!-- остальная часть формы -->
-                        <div class="divider"><span>Или войдите через:</span></div>
-                        <!-- ... соцсети и ссылки ... -->
+                    <!-- остальная часть формы -->
+                    <div class="divider"><span>Или войдите через:</span></div>
 
-                        <div class="social-login">
-                            <button type="button" class="social-btn">
-                                <img src="/static/blog/images/google.svg" alt="Google" class="social-icon">
-                                Google
-                            </button>
-                            <button type="button" class="social-btn">
-                                <img src="/static/blog/images/gosuslugi.svg" alt="Email" class="social-icon">
-                                Госуслуги
-                            </button>
-                            <button type="button" class="social-btn">
-                                <img src="/static/blog/images/vk.svg" alt="VK" class="social-icon">
-                                ВК
-                            </button>
-                        </div>
 
-                        <div class="login-link">
-                            Нет аккаунта? <a href="{% url 'blog:reg' %}">Зарегистрируйтесь</a>
-                        </div>
-                    </form>
+                    <div class="social-login">
+                        <button type="button" class="social-btn">
+                            <img src="/static/blog/images/google.svg" alt="Google" class="social-icon">
+                            Google
+                        </button>
+                        <button type="button" class="social-btn">
+                            <img src="/static/blog/images/gosuslugi.svg" alt="Email" class="social-icon">
+                            Госуслуги
+                        </button>
+                        <button type="button" class="social-btn">
+                            <img src="/static/blog/images/vk.svg" alt="VK" class="social-icon">
+                            ВК
+                        </button>
+                    </div>
+
+                    <div class="login-link">
+                        Нет аккаунта? <a href="{% url 'blog:reg' %}">Зарегистрируйтесь</a>
+                    </div>
+                </form>
             </div>
         </main>
 
