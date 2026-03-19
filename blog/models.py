@@ -10,9 +10,10 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils import timezone
 
 
+# кастомный менеджер 
 class UserManager(BaseUserManager):
     """Менеджер для кастомной модели пользователя"""
-    
+    # переопределил метод create_user
     def create_user(self, email, full_name, password=None, **extra_fields):
         """Создание обычного пользователя"""
         if not email:
@@ -29,7 +30,7 @@ class UserManager(BaseUserManager):
         user.set_password(password)
         user.save(using=self._db)
         return user
-    
+    # переопределил метод create_superuser
     def create_superuser(self, email, full_name, password=None, **extra_fields):
         """Создание суперпользователя"""
         extra_fields.setdefault('is_staff', True)

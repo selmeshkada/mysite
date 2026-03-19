@@ -5,6 +5,7 @@ from .models import (User, SubscriptionPlan, Subscription, Company, Category, Tr
 from .models import User
 from django.contrib.auth import authenticate
 
+
 class UserRegistrationForm(forms.ModelForm):
     full_name = forms.CharField(
         label='Полное имя',
@@ -25,10 +26,23 @@ class UserRegistrationForm(forms.ModelForm):
         label='Повторите пароль',
         widget=forms.PasswordInput(attrs={'class': 'form-input'})
     )
-
+    
+    agreement = forms.BooleanField(
+        required=True,
+        error_messages={'required': 'Нужно согласие'}
+    )
+    
     class Meta:
         model = User
-        fields = ['full_name', 'email']
+        fields = ['email']  # только email в модели, full_name обработаем отдельно
+
+    def clean_full_name(self):
+        full_name = self.cleaned_data.get('full_name', '').strip()
+        if not full_name:
+            raise forms.ValidationError('Введите имя и фамилию')
+        if ' ' not in full_name:
+            raise forms.ValidationError('Введите Имя и Фамилию через пробел')
+        return full_name
 
     def clean_email(self):
         email = self.cleaned_data.get('email')
@@ -45,6 +59,15 @@ class UserRegistrationForm(forms.ModelForm):
     def save(self, commit=True):
         user = super().save(commit=False)
         user.set_password(self.cleaned_data['password'])
+        
+        # Разбираем full_name на first_name и last_name
+        full_name = self.cleaned_data.get('full_name', '')
+        name_parts = full_name.split(' ', 1)
+        user.first_name = name_parts[0]
+        user.last_name = name_parts[1] if len(name_parts) > 1 else ''
+        
+        user.username = self.cleaned_data['email']  # email как username
+        
         if commit:
             user.save()
         return user

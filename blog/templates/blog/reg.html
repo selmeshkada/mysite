@@ -19,36 +19,36 @@
             <div class="registration-container">
                 <form class="registration-form" method="post" action="{% url 'blog:reg' %}">
                     {% csrf_token %}
+                    {% if form.non_field_errors %}
+                    <div class="form-error">
+                        {{ form.non_field_errors.0 }}
+                    </div>
+                    {% endif %}
                     <h1 class="registration-title">Регистрация</h1>
                     <div class="trial-badge">
                         14 дней бесплатного пробного тарифа "Базовый"
                     </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="first_name">Имя</label>
-                            <input type="text" name="first_name" id="first_name" class="form-input" placeholder="Имя"
-                                value="{{ form.first_name.value|default:'' }}">
-                            {% if form.first_name.errors %}
-                            <div class="error">{{ form.first_name.errors }}</div>
-                            {% endif %}
-                        </div>
 
-                        <div class="form-group">
-                            <label for="last_name">Фамилия</label>
-                            <input type="text" name="last_name" id="last_name" class="form-input" placeholder="Фамилия"
-                                value="{{ form.last_name.value|default:'' }}">
-                            {% if form.last_name.errors %}
-                            <div class="error">{{ form.last_name.errors }}</div>
-                            {% endif %}
+                    <div class="form-group">
+                        <label for="full_name">ФИО</label>
+                        <input type="text" name="full_name" id="full_name" class="form-input" placeholder="Фио"
+                            value="{{ form.full_name.value|default:'' }}">
+                        {% if form.full_name.errors %}
+                        <div class="error-text">
+                            {{ form.full_name.errors.0 }}
                         </div>
+                        {% endif %}
                     </div>
+
 
                     <div class="form-group">
                         <label for="email">Email</label>
                         <input type="email" name="email" id="email" class="form-input" placeholder="email@example.com"
                             value="{{ form.email.value|default:'' }}">
                         {% if form.email.errors %}
-                        <div class="error">{{ form.email.errors }}</div>
+                        <div class="error-text">
+                            {{ form.email.errors.0 }}
+                        </div>
                         {% endif %}
                     </div>
 
@@ -68,11 +68,11 @@
                         <div class="error">{{ form.password2.errors }}</div>
                         {% endif %}
                     </div>
+                    
                     <div class="checkbox-group">
-                        <input type="checkbox" id="agreement">
+                        <input type="checkbox" name="agreement" id="agreement" value="on">
                         <label for="agreement">Согласен(-на) на обработку персональных данных</label>
                     </div>
-
                     <button type="submit" class="register-btn">Начать</button>
 
                     <div class="divider">

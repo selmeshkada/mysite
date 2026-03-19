@@ -21,6 +21,7 @@ from .models import (
     User, SubscriptionPlan, Subscription, Company,
     Category, Transaction, Report, Notification
 )
+
 from .forms import (
     UserRegistrationForm, UserLoginForm,
     SubscriptionPlanForm, SubscriptionForm, CompanyForm,
@@ -29,7 +30,6 @@ from .forms import (
 )
 
 from django.contrib.messages import get_messages
-
 from django import forms
 from django.contrib.auth import authenticate
 
@@ -51,7 +51,7 @@ class UserLoginForm(forms.Form):
 
         return cleaned_data
     
-    
+
 def login_page(request):
     if request.user.is_authenticated:
         return redirect('blog:dashboard')
@@ -70,31 +70,22 @@ def login_page(request):
 def reg_page(request):
     if request.user.is_authenticated:
         return redirect('blog:dashboard')
-    
-    if request.method == 'POST':
-        form = UserRegistrationForm(request.POST)
-        if form.is_valid():
-            new_user = form.save(commit=False)
-            new_user.set_password(form.cleaned_data['password'])
 
-            new_user.save()
-            
-            # Автоматический вход после регистрации
-            user = authenticate(
-                request,
-                username=new_user.username,  # ← используем сохраненный username
-                password=form.cleaned_data['password']
-            )
+    if request.method == 'POST':
+        print("POST data:", request.POST)  # ← ЧТО ПРИХОДИТ?
+        form = UserRegistrationForm(request.POST)
+        print("Form errors:", form.errors)  # ← ОШИБКИ В КОНСОЛЬ
+        print("Form is valid:", form.is_valid())  # ← True/False
+
+        if form.is_valid():
+            print("SAVING USER...")
+            user = form.save()
             login(request, user)
-            
-            messages.success(request, f'С возвращением, {new_user.first_name}!')
             return redirect('blog:dashboard')
     else:
         form = UserRegistrationForm()
-    
+
     return render(request, 'blog/reg.html', {'form': form})
-
-
 
 # ============== СТРАНИЦЫ САЙТА (PUBLIC) ==============
 
