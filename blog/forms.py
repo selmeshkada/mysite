@@ -248,13 +248,13 @@ class CategoryForm(forms.ModelForm):
     """Форма для создания/редактирования категории"""
     class Meta:
         model = Category
-        fields = ['name', 'type', 'icon']
+        fields = ['name', 'category_type', 'icon']
         widgets = {
             'name': forms.TextInput(attrs={
                 'class': 'form-input',
                 'placeholder': 'Продукты'
             }),
-            'type': forms.Select(attrs={'class': 'form-select'}),
+            'category_type': forms.Select(attrs={'class': 'form-select'}),
             'icon': forms.TextInput(attrs={
                 'class': 'form-input',
                 'placeholder': 'shopping-cart'
@@ -262,19 +262,19 @@ class CategoryForm(forms.ModelForm):
         }
         labels = {
             'name': 'Название категории',
-            'type': 'Тип',
+            'category_type': 'Тип',
             'icon': 'Иконка',
         }
 
     def clean_name(self):
         """Валидация уникальности названия категории"""
         name = self.cleaned_data.get('name')
-        category_type = self.cleaned_data.get('type')
+        category_type = self.cleaned_data.get('category_type')
         
         if name and category_type:
             existing = Category.objects.filter(
                 name__iexact=name,
-                type=category_type
+                category_type=category_type
             )
             if self.instance and self.instance.pk:
                 existing = existing.exclude(pk=self.instance.pk)

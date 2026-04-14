@@ -77,7 +77,15 @@ class User(AbstractUser):
         null=True,
         verbose_name="Аватар"
     )
-    
+
+    following = models.ManyToManyField(
+        'self',
+        symmetrical=False,
+        blank=True,
+        related_name='followers',
+        verbose_name="Подписки"
+    )
+
     # Указываем менеджер
     objects = UserManager()
     
@@ -245,41 +253,52 @@ class Company(models.Model):
 
     def __str__(self):
         return f"{self.name} (ИНН: {self.inn})"
-
-
+    
+    
 class Category(models.Model):
-    """
-    Модель категорий (categories)
-    """
     CATEGORY_TYPE_CHOICES = [
         ('income', 'Доход'),
         ('expense', 'Расход'),
     ]
-
-    name = models.CharField(
-        max_length=100,
-        verbose_name="Название категории"
+    
+    user = models.ForeignKey(
+        User, 
+        on_delete=models.CASCADE, 
+        related_name='categories',
+        verbose_name="Пользователь",
+        null=True,
+        blank=True
     )
-    type = models.CharField(
-        max_length=10,
+    name = models.CharField(max_length=100, verbose_name="Название категории")
+    category_type = models.CharField(
+        max_length=10, 
         choices=CATEGORY_TYPE_CHOICES,
         verbose_name="Тип категории"
     )
+    color = models.CharField(
+        max_length=7, 
+        default='#0066cc',
+        verbose_name="Цвет"
+    )
     icon = models.CharField(
-        max_length=50,
-        blank=True,
+        max_length=50, 
+        blank=True, 
         null=True,
         verbose_name="Иконка"
     )
-
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name="Дата создания"
+    )
+    
     class Meta:
-        db_table = 'categories'
+        unique_together = ['user', 'name', 'category_type']
         verbose_name = "Категория"
         verbose_name_plural = "Категории"
-
+    
     def __str__(self):
-        return f"{self.get_type_display()}: {self.name}"
-
+        return f"{self.name} ({self.get_category_type_display()})"
+    
 
 class Transaction(models.Model):
     """
