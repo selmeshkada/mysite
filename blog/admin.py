@@ -2,11 +2,9 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from .models import (
     User, SubscriptionPlan, Subscription, Company,
-    Category, Transaction, Report, Notification
+    Category, Transaction, Report, Notification, CompanyMembership
 )
 
-
-# ============== INLINE КЛАССЫ ==============
 
 class SubscriptionInline(admin.TabularInline):
     """Подписки пользователя (внутри пользователя)"""
@@ -24,6 +22,7 @@ class CompanyInline(admin.TabularInline):
     fields = ('name', 'inn', 'tax_system', 'created_at')
     readonly_fields = ('created_at',)
     show_change_link = True
+    fk_name = 'creator'
 
 
 class CategoryInline(admin.TabularInline):
@@ -33,7 +32,7 @@ class CategoryInline(admin.TabularInline):
     fields = ('name', 'category_type', 'color', 'created_at')
     readonly_fields = ('created_at',)
     show_change_link = True
-
+    max_num = 50
 
 class NotificationInline(admin.TabularInline):
     """Уведомления пользователя (внутри пользователя)"""
@@ -60,11 +59,9 @@ class OrderItemInline(admin.TabularInline):
     # fields = ('product', 'price', 'quantity')
 
 
-# ============== АДМИНКИ ==============
-
 @admin.register(User)
 class CustomUserAdmin(UserAdmin):
-    """Админка для пользователей (кастомная модель без username)"""
+    """Админка для пользователей"""
     list_display = ('email', 'full_name', 'phone', 'is_active', 'created_at')
     list_filter = ('is_active',)
     search_fields = ('email', 'full_name', 'phone')
@@ -73,7 +70,6 @@ class CustomUserAdmin(UserAdmin):
     list_display_links = ('email',)
     filter_horizontal = ('following',)
     
-    # Убираем username из полей
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
         ('Личная информация', {'fields': ('full_name', 'phone', 'avatar')}),
@@ -82,29 +78,25 @@ class CustomUserAdmin(UserAdmin):
         ('Важные даты', {'fields': ('last_login', 'date_joined', 'created_at')}),
     )
     
-    # Форма для добавления нового пользователя (без username)
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'full_name', 'password1', 'password2'),
+            'fields': ('email', 'full_name', 'phone', 'password1', 'password2'),
         }),
     )
     
-    # Убираем поле username из формы, если оно вдруг появится
-    def get_form(self, request, obj=None, **kwargs):
-        form = super().get_form(request, obj, **kwargs)
-        if 'username' in form.base_fields:
-            del form.base_fields['username']
-        return form
-    
-    # inlines для связанных моделей
     inlines = [
         SubscriptionInline,
         CompanyInline,
         CategoryInline,
         NotificationInline,
     ]
-
+    
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        if 'username' in form.base_fields:
+            del form.base_fields['username']
+        return form
 
 @admin.register(SubscriptionPlan)
 class SubscriptionPlanAdmin(admin.ModelAdmin):
@@ -149,21 +141,26 @@ class SubscriptionAdmin(admin.ModelAdmin):
         }),
     )
 
+class CompanyMembershipInline(admin.TabularInline):
+    model = CompanyMembership
+    extra = 1
+    raw_id_fields = ('user',)
+    fields = ('user', 'role', 'joined_at')
+    readonly_fields = ('joined_at',)
 
 @admin.register(Company)
 class CompanyAdmin(admin.ModelAdmin):
-    """Админка для компаний"""
-    list_display = ('name', 'inn', 'creator', 'tax_system', 'created_at')
-    list_filter = ('tax_system', 'created_at')
-    search_fields = ('name', 'inn', 'creator__email')
+    list_display = ('name', 'inn', 'creator', 'responsible_editor_phone', 'last_edited_at', 'created_at')
+    list_filter = ('tax_system', 'created_at', 'ogrn')
+    search_fields = ('name', 'inn', 'creator__email', 'responsible_editor__email', 'responsible_editor__phone')
     ordering = ('-created_at',)
     list_display_links = ('name',)
-    raw_id_fields = ('creator',)
+    raw_id_fields = ('creator', 'responsible_editor')
     date_hierarchy = 'created_at'
     
     fieldsets = (
         ('Основная информация', {
-            'fields': ('creator', 'name')
+            'fields': ('creator', 'responsible_editor', 'name')
         }),
         ('Реквизиты', {
             'fields': ('inn', 'ogrn', 'legal_address')
@@ -173,22 +170,45 @@ class CompanyAdmin(admin.ModelAdmin):
         }),
     )
     
-    # ✅ ДОБАВЛЕНО: транзакции компании
-    inlines = [TransactionInline]
+    inlines = [CompanyMembershipInline, TransactionInline]
+    
+    def responsible_editor_phone(self, obj):
+        """Отображает почту ответственного редактора"""
+        if obj.responsible_editor:
+            phone = obj.responsible_editor.phone
+            if phone:
+                return phone
+            return obj.responsible_editor.email
+        return "—"
+    responsible_editor_phone.short_description = "Ответственный (почта)"
+    
+    def save_model(self, request, obj, form, change):
+        if change:
+            obj.responsible_editor = request.user
+        else:
+            obj.creator = request.user
+        super().save_model(request, obj, form, change)
 
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     """Админка для категорий"""
-    list_display = ('name', 'category_type', 'icon', 'colored_type')
-    list_filter = ('category_type',)
-    search_fields = ('name',)
-    ordering = ('category_type', 'name')
+    list_display = ('name', 'category_type', 'user_link', 'icon', 'created_at')
+    list_filter = ('category_type', 'user')
+    search_fields = ('name', 'user__email', 'user__full_name')
+    ordering = ('user__email', 'name')
     list_display_links = ('name',)
+    raw_id_fields = ('user',)
     
+    def user_link(self, obj):
+            if obj.user:
+                return f"{obj.user.email} ({obj.user.phone or '—'})"
+            return "—"
+    user_link.short_description = "Пользователь"
+
     @admin.display(description='Тип', ordering='category_type')
     def colored_type(self, obj):
-        colors = {'income': '🟢 Доход', 'expense': '🔴 Расход'}
+        colors = {'income': 'Доход', 'expense': 'Расход'}
         return colors.get(obj.category_type, '⚪')
 
 

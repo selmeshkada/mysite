@@ -11,22 +11,23 @@ class UserRegistrationForm(forms.ModelForm):
         label='Полное имя',
         widget=forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Иван Иванов'})
     )
-
     email = forms.EmailField(
         label='Email',
-        widget=forms.EmailInput(attrs={'class': 'form-input'})
+        widget=forms.EmailInput(attrs={'class': 'form-input', 'placeholder': 'example@mail.ru'})
     )
-
+    phone = forms.CharField(
+        label='Телефон',
+        required=False,
+        widget=forms.TextInput(attrs={'class': 'form-input', 'placeholder': '+7 (999) 123-45-67'})
+    )
     password = forms.CharField(
         label='Пароль',
-        widget=forms.PasswordInput(attrs={'class': 'form-input'})
+        widget=forms.PasswordInput(attrs={'class': 'form-input', 'placeholder': '••••••••'})
     )
-
     password2 = forms.CharField(
         label='Повторите пароль',
-        widget=forms.PasswordInput(attrs={'class': 'form-input'})
+        widget=forms.PasswordInput(attrs={'class': 'form-input', 'placeholder': '••••••••'})
     )
-    
     agreement = forms.BooleanField(
         required=True,
         error_messages={'required': 'Нужно согласие'}
@@ -34,7 +35,7 @@ class UserRegistrationForm(forms.ModelForm):
     
     class Meta:
         model = User
-        fields = ['email']  # только email в модели, full_name обработаем отдельно
+        fields = ['full_name', 'email', 'phone']
 
     def clean_full_name(self):
         full_name = self.cleaned_data.get('full_name', '').strip()
@@ -47,8 +48,14 @@ class UserRegistrationForm(forms.ModelForm):
     def clean_email(self):
         email = self.cleaned_data.get('email')
         if User.objects.filter(email=email).exists():
-            raise forms.ValidationError('Пользователь уже существует')
+            raise forms.ValidationError('Пользователь с таким email уже существует')
         return email
+
+    def clean_phone(self):
+        phone = self.cleaned_data.get('phone')
+        if phone and User.objects.filter(phone=phone).exists():
+            raise forms.ValidationError('Пользователь с таким телефоном уже существует')
+        return phone
 
     def clean(self):
         cleaned_data = super().clean()
@@ -59,15 +66,7 @@ class UserRegistrationForm(forms.ModelForm):
     def save(self, commit=True):
         user = super().save(commit=False)
         user.set_password(self.cleaned_data['password'])
-        
-        # Разбираем full_name на first_name и last_name
-        full_name = self.cleaned_data.get('full_name', '')
-        name_parts = full_name.split(' ', 1)
-        user.first_name = name_parts[0]
-        user.last_name = name_parts[1] if len(name_parts) > 1 else ''
-        
-        user.username = self.cleaned_data['email']  # email как username
-        
+        user.username = self.cleaned_data['email']
         if commit:
             user.save()
         return user

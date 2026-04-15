@@ -2,18 +2,12 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils import timezone
-
-
-from django.db import models
+from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from django.contrib.auth.models import AbstractUser, BaseUserManager
-from django.core.validators import MinValueValidator, MaxValueValidator
-from django.utils import timezone
 
-
-# кастомный менеджер 
 class UserManager(BaseUserManager):
     """Менеджер для кастомной модели пользователя"""
-    # переопределил метод create_user
     def create_user(self, email, full_name, password=None, **extra_fields):
         """Создание обычного пользователя"""
         if not email:
@@ -30,7 +24,6 @@ class UserManager(BaseUserManager):
         user.set_password(password)
         user.save(using=self._db)
         return user
-    # переопределил метод create_superuser
     def create_superuser(self, email, full_name, password=None, **extra_fields):
         """Создание суперпользователя"""
         extra_fields.setdefault('is_staff', True)
@@ -44,9 +37,9 @@ class User(AbstractUser):
     """
     Модель пользователя (соответствует таблице users)
     """
-    username = None  # Отключаем поле username
-    first_name = None  # Отключаем стандартное first_name
-    last_name = None  # Отключаем стандартное last_name
+    username = None
+    first_name = None
+    last_name = None
     
     email = models.EmailField(
         unique=True,
@@ -86,10 +79,8 @@ class User(AbstractUser):
         verbose_name="Подписки"
     )
 
-    # Указываем менеджер
     objects = UserManager()
     
-    # Указываем поле для логина
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['full_name']
 
@@ -100,6 +91,27 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.email
+
+User = get_user_model()
+
+class CompanyMembership(models.Model):
+    ROLE_CHOICES = [
+        ('owner', 'Владелец'),
+        ('manager', 'Менеджер'),
+        ('employee', 'Сотрудник'),
+    ]
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='company_memberships', verbose_name= 'Пользователь')
+    company = models.ForeignKey('Company', on_delete=models.CASCADE, related_name='memberships')
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='employee', verbose_name= 'Роль')
+    joined_at = models.DateTimeField(auto_now_add=True, verbose_name= 'Дата присоединения')
+
+    class Meta:
+        unique_together = ['user', 'company']
+        verbose_name = "Участник компании"
+        verbose_name_plural = "Участники компаний"
+
+    def __str__(self):
+        return f"{self.user.full_name} - {self.company.name} ({self.get_role_display()})"
 
 
 class SubscriptionPlan(models.Model):
@@ -216,17 +228,41 @@ class Company(models.Model):
     creator = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='companies',
+        related_name='created_companies',
         verbose_name="Создатель"
     )
+
+    # Добавляем ManyToMany через промежуточную модель
+    members = models.ManyToManyField(
+        User,
+        through='CompanyMembership',
+        related_name='companies',
+        verbose_name="Участники"
+    )
+
+    # Поля для ответственного редактора
+    responsible_editor = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='edited_companies',
+        verbose_name="Ответственный за редактирование"
+    )
+
+    last_edited_at = models.DateTimeField(
+        auto_now=True,
+        verbose_name="Дата последнего редактирования"
+    )
+
     name = models.CharField(
         max_length=255,
         verbose_name="Название компании"
     )
+
     inn = models.CharField(
         max_length=12,
         verbose_name="ИНН"
     )
+
     ogrn = models.CharField(
         max_length=15,
         blank=True,
@@ -245,6 +281,32 @@ class Company(models.Model):
         default=timezone.now,
         verbose_name="Дата создания"
     )
+
+    def is_incomplete(self):
+        """Проверка, заполнены ли обязательные данные"""
+        missing = []
+        if not self.inn:
+            missing.append('ИНН')
+        if not self.legal_address:
+            missing.append('Юридический адрес')
+        # можно добавить другие проверки
+        return missing
+
+    def save(self, *args, **kwargs):
+        # Если сохраняется без указания ответственного редактора, ставим создателя
+        if not self.responsible_editor_id and self.creator_id:
+            self.responsible_editor = self.creator
+        super().save(*args, **kwargs)
+        # После сохранения проверяем неполные данные и можно отправить уведомление
+        if self.is_incomplete() and self.responsible_editor:
+            # Здесь можно создать Notification или отправить email
+            # Пока просто создадим уведомление в БД
+            Notification.objects.create(
+                user=self.responsible_editor,
+                title=f"Неполные данные компании {self.name}",
+                content=f"Отсутствуют поля: {', '.join(self.is_incomplete())}. Пожалуйста, заполните.",
+                notification_date=timezone.now()
+            )
 
     class Meta:
         db_table = 'companies'
