@@ -5,7 +5,9 @@ from django.utils import timezone
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import AbstractUser, BaseUserManager
+from django.urls import reverse
 
+ 
 class UserManager(BaseUserManager):
     """Менеджер для кастомной модели пользователя"""
     def create_user(self, email, full_name, password=None, **extra_fields):
@@ -232,7 +234,6 @@ class Company(models.Model):
         verbose_name="Создатель"
     )
 
-    # Добавляем ManyToMany через промежуточную модель
     members = models.ManyToManyField(
         User,
         through='CompanyMembership',
@@ -240,7 +241,6 @@ class Company(models.Model):
         verbose_name="Участники"
     )
 
-    # Поля для ответственного редактора
     responsible_editor = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -289,18 +289,13 @@ class Company(models.Model):
             missing.append('ИНН')
         if not self.legal_address:
             missing.append('Юридический адрес')
-        # можно добавить другие проверки
         return missing
 
     def save(self, *args, **kwargs):
-        # Если сохраняется без указания ответственного редактора, ставим создателя
         if not self.responsible_editor_id and self.creator_id:
             self.responsible_editor = self.creator
         super().save(*args, **kwargs)
-        # После сохранения проверяем неполные данные и можно отправить уведомление
         if self.is_incomplete() and self.responsible_editor:
-            # Здесь можно создать Notification или отправить email
-            # Пока просто создадим уведомление в БД
             Notification.objects.create(
                 user=self.responsible_editor,
                 title=f"Неполные данные компании {self.name}",
@@ -361,7 +356,10 @@ class Category(models.Model):
     def __str__(self):
         return f"{self.name} ({self.get_category_type_display()})"
     
-
+    def get_absolute_url(self):
+        return reverse('blog:category-list')
+    
+    
 class Transaction(models.Model):
     """
     Модель транзакций (transactions)

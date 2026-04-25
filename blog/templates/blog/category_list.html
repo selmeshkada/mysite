@@ -1,0 +1,22 @@
+{% if categories %}
+<ul class="category-list">
+    <h3>Категории пользователя {{ user.username }}</h3>
+    {% for cat in categories %}
+    <li>
+        {{ cat.name }}
+        ({{ cat.get_category_type_display }}) —
+        {{ cat.transaction_count }} операций
+    </li>
+    {% endfor %}
+</ul>
+{% for p in paginator.page_range %}
+{% if page_obj.number == p %}
+<li class="page-num page-num-selected">{{ p }}</li>
+{% elif p >= page_obj.number|add:-2 and p <= page_obj.number|add:2 %} <li class="page-num">
+    <a href="?page={{ p }}">{{ p }}</a>
+    </li>
+    {% endif %}
+    {% endfor %}
+    {% else %}
+    <p>Нет категорий</p>
+    {% endif %}

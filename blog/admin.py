@@ -34,6 +34,7 @@ class CategoryInline(admin.TabularInline):
     show_change_link = True
     max_num = 50
 
+
 class NotificationInline(admin.TabularInline):
     """Уведомления пользователя (внутри пользователя)"""
     model = Notification

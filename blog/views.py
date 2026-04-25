@@ -16,6 +16,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django import forms
 from django.contrib.auth import authenticate
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
 
 from .models import (
     User, SubscriptionPlan, Subscription, Company,
@@ -72,10 +74,10 @@ def reg_page(request):
         return redirect('blog:dashboard')
 
     if request.method == 'POST':
-        print("POST data:", request.POST)  # ← ЧТО ПРИХОДИТ?
+        print("POST data:", request.POST)
         form = UserRegistrationForm(request.POST)
-        print("Form errors:", form.errors)  # ← ОШИБКИ В КОНСОЛЬ
-        print("Form is valid:", form.is_valid())  # ← True/False
+        print("Form errors:", form.errors) 
+        print("Form is valid:", form.is_valid()) 
 
         if form.is_valid():
             print("SAVING USER...")
@@ -334,10 +336,10 @@ class CategoryListView(LoginRequiredMixin, ListView):
     model = Category
     template_name = 'blog/category_list.html'
     context_object_name = 'categories'
-    paginate_by = 20
+    paginate_by = 2
 
     def get_queryset(self):
-        return Category.objects.all().order_by('type', 'name')
+        return Category.objects.annotate(transaction_count=Count('transactions')).order_by('category_type', 'name')
 
 
 class CategoryCreateView(LoginRequiredMixin, CreateView):
@@ -386,7 +388,23 @@ class TransactionListView(LoginRequiredMixin, ListView):
     model = Transaction
     template_name = 'blog/transaction_list.html'
     context_object_name = 'transactions'
-    paginate_by = 20
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        transactions_list = self.get_queryset()
+        paginator = Paginator(transactions_list, self.paginate_by)
+        page = self.request.GET.get('page', 1)
+
+        try:
+            transactions = paginator.page(page)
+        except PageNotAnInteger:
+            transactions = paginator.page(1)
+        except EmptyPage:
+            transactions = paginator.page(paginator.num_pages)
+
+        context['transactions'] = transactions
+        context['paginator'] = paginator
+        return context
 
     def get_queryset(self):
         companies = Company.objects.filter(creator=self.request.user)
